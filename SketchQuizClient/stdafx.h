@@ -143,20 +143,26 @@ static HWND			hwndHome_Notice;	// 공지사항 입력 윈도우
 #define TYPE_DRAWRECTANGLE	4001		// 메시지 타입 : 사각형 그리기
 #define TYPE_DRAWTRIANGLE	4002		// 메시지 타입 : 삼각형 그리기
 #define TYPE_DRAWSTRAIGHT	4003		// 메시지 타입 : 직선 그리기
+#define TYPE_DRAWPENTAGON	4004		// 메시지 타입 : 오각형 그리기
+#define TYPE_DRAWSTAR		4005		// 메시지 타입 : 별 그리기
 
 #define WM_DRAWELLIPSE		 (WM_USER+3)	// 타원 그리기 윈도우 메시지
 #define WM_ERASEALITTLE		 (WM_USER+4)	// 특정 부분 조금 지우기 윈도우 메시지
 #define WM_DRAWRECTANGLE	 (WM_USER+5)	// 사각형 그리기 윈도우 메시지
 #define WM_DRAWTRIAGNGLE	 (WM_USER+6)	// 삼각형 그리기 윈도우 메시지
 #define WM_DRAWSTRAIGHT		 (WM_USER+7)	// 직선 그리기 윈도우 메시지
+#define WM_DRAWPENTAGON		 (WM_USER+8)	// 오각형 그리기 윈도우 메시지
+#define WM_DRAWSTAR			 (WM_USER+9)	// 별 그리기 윈도우 메시지
 
 // 그리기 모드 종류
-#define MODE_ERASE 4500
-#define MODE_LINE 4501
-#define MODE_ELLIPSE 4502
-#define MODE_RECTANGLE 4503
-#define MODE_TRIANGLE 4504
-#define MODE_STRAIGHT 4505
+#define MODE_ERASE		4500
+#define MODE_LINE		4501
+#define MODE_ELLIPSE	4502
+#define MODE_RECTANGLE	4503
+#define MODE_TRIANGLE	4504
+#define MODE_STRAIGHT	4505
+#define MODE_PENTAGON	4506
+#define MODE_STAR		4507
 
 // 현재 그리기 모드 전역 변수
 static int g_currentSelectFigureMode = MODE_LINE;

@@ -572,6 +572,30 @@ LRESULT CALLBACK ChildWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 				sendn(g_sock, (char*)&g_drawpolygonmsg, SIZE_TOT, 0, serveraddr, g_isUDP);
 				break;
 
+			// "오각형" 그리기 모드
+			case MODE_PENTAGON:
+				g_drawpolygonmsg.type = TYPE_DRAWPENTAGON;
+				g_drawpolygonmsg.startX = x0;
+				g_drawpolygonmsg.startY = y0;
+				g_drawpolygonmsg.endX = LOWORD(lParam);
+				g_drawpolygonmsg.endY = HIWORD(lParam);
+				g_drawpolygonmsg.color = g_clientDrawDetailInformation.color;
+				g_drawpolygonmsg.width = g_clientDrawDetailInformation.width;
+				sendn(g_sock, (char*)&g_drawpolygonmsg, SIZE_TOT, 0, serveraddr, g_isUDP);
+				break;
+
+			// "별" 그리기 모드
+			case MODE_STAR:
+				g_drawpolygonmsg.type = TYPE_DRAWSTAR;
+				g_drawpolygonmsg.startX = x0;
+				g_drawpolygonmsg.startY = y0;
+				g_drawpolygonmsg.endX = LOWORD(lParam);
+				g_drawpolygonmsg.endY = HIWORD(lParam);
+				g_drawpolygonmsg.color = g_clientDrawDetailInformation.color;
+				g_drawpolygonmsg.width = g_clientDrawDetailInformation.width;
+				sendn(g_sock, (char*)&g_drawpolygonmsg, SIZE_TOT, 0, serveraddr, g_isUDP);
+				break;
+
 			default:
 				break;
 			}
@@ -608,6 +632,16 @@ LRESULT CALLBACK ChildWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 	// 직선 그리기 메시지 받음
 	case WM_DRAWSTRAIGHT:
 		DrawPolygonProcess(hWnd, hDCMem, wParam, lParam, g_serverDrawDetailInformation, MODE_STRAIGHT);
+		return 0;
+
+	// 오각형 그리기 메시지 받음
+	case WM_DRAWPENTAGON:
+		DrawPolygonProcess(hWnd, hDCMem, wParam, lParam, g_serverDrawDetailInformation, MODE_PENTAGON);
+		return 0;
+
+	// 별 그리기 메시지 받음
+	case WM_DRAWSTAR:
+		DrawPolygonProcess(hWnd, hDCMem, wParam, lParam, g_serverDrawDetailInformation, MODE_STAR);
 		return 0;
 		
 	//
@@ -1331,6 +1365,26 @@ DWORD WINAPI ReadThread(LPVOID arg)
 			g_serverDrawDetailInformation.width = drawPolygon_msg->width;
 			g_serverDrawDetailInformation.color = drawPolygon_msg->color;
 			SendMessage(g_hDrawWnd, WM_DRAWSTRAIGHT,
+				MAKEWPARAM(drawPolygon_msg->startX, drawPolygon_msg->startY),
+				MAKELPARAM(drawPolygon_msg->endX, drawPolygon_msg->endY));
+			break;
+
+		// 오각형 그리기
+		case TYPE_DRAWPENTAGON:
+			drawPolygon_msg = (DRAWPOLYGON_MSG*)&comm_msg;
+			g_serverDrawDetailInformation.width = drawPolygon_msg->width;
+			g_serverDrawDetailInformation.color = drawPolygon_msg->color;
+			SendMessage(g_hDrawWnd, WM_DRAWPENTAGON,
+				MAKEWPARAM(drawPolygon_msg->startX, drawPolygon_msg->startY),
+				MAKELPARAM(drawPolygon_msg->endX, drawPolygon_msg->endY));
+			break;
+
+		// 별 그리기
+		case TYPE_DRAWSTAR:
+			drawPolygon_msg = (DRAWPOLYGON_MSG*)&comm_msg;
+			g_serverDrawDetailInformation.width = drawPolygon_msg->width;
+			g_serverDrawDetailInformation.color = drawPolygon_msg->color;
+			SendMessage(g_hDrawWnd, WM_DRAWSTAR,
 				MAKEWPARAM(drawPolygon_msg->startX, drawPolygon_msg->startY),
 				MAKELPARAM(drawPolygon_msg->endX, drawPolygon_msg->endY));
 			break;
