@@ -237,18 +237,24 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					ID_MSG* id_msg;
 					id_msg = (ID_MSG*)&(ptr->buf); // ID로 형변환
 					printf("[TYPE_ID 받은 데이터] %s\n", id_msg->msg);
-					id_msg = (ID_MSG*)&(ptr->buf); // ID로 형변환
-					printf("[TYPE_ID 받은 데이터] %s\n", id_msg->msg);
+					
+					// 만약 현재 받은 닉네임이 중복되지 않았다면 (ture)
+					if (CheckIDDuplication(nTotalSockets, SocketInfoArray, id_msg->msg)) {
+						printf("[TCP] 중복된 아이디 없음");
+						setIDInSocket(id_msg->msg, ptr); //id 등록
+						printf("[TCP] TYPE_ID, 현재 소켓 닉네임 등록완료 : %s\n", ptr->id_nickname_char);
+						printf("[TCP] TYPE_ID, 현재 소켓 port 등록완료 : %d\n", ptr->sin_port);
+						printf("[TCP] TYPE_ID, 현재 소켓 주소(char) : %s\n", inet_ntoa(ptr->sin_addr));
+						MessageBox(NULL, ptr->id_nickname, _T("현재 소켓 닉네임 등록완료(_TCHAR)"), MB_ICONERROR);
+						// =========== 지윤 ============
+						AddClientToListView(ptr->sin_port, ptr->id_nickname_char);
+						DisplayClientList();
+						// =============================
+					}
+					else {	// id 중복이 있다면, 등록 실패
+						printf("[TCP] ID가 중복됩니다. 등록 실패입니다.");
+					}
 
-					setIDInSocket(id_msg->msg, ptr); //id 등록
-					printf("[TCP] TYPE_ID, 현재 소켓 닉네임 등록완료 : %s\n", ptr->id_nickname_char);
-					printf("[TCP] TYPE_ID, 현재 소켓 port 등록완료 : %d\n", ptr->sin_port);
-					printf("[TCP] TYPE_ID, 현재 소켓 주소(char) : %s\n", inet_ntoa(ptr->sin_addr));
-					MessageBox(NULL, ptr->id_nickname, _T("현재 소켓 닉네임 등록완료(_TCHAR)"), MB_ICONERROR);
-					// =========== 지윤 ============
-					AddClientToListView(ptr->sin_port, ptr->id_nickname_char);
-					DisplayClientList();
-					// =============================
 					break;
 					// ======== 연경 =======
 				case TYPE_CHAT:
@@ -261,8 +267,8 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					break;
 			}
 
-			printf("[TCP 클라이언트] %d바이트를 받았습니다.\n", retval);
-			printf("[받은 데이터] %s\n", ptr->buf);
+			//printf("[TCP 클라이언트] %d바이트를 받았습니다.\n", retval);
+			//printf("[받은 데이터] %s\n", ptr->buf);
 			// ================================================================== //
 			// 
 			// ======== 연경 =======
