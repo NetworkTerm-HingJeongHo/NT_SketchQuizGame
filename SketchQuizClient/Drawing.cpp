@@ -93,6 +93,7 @@ void AddFigureOption(HWND hDlg)
 	SendDlgItemMessage(hDlg, IDC_FIGURE, CB_ADDSTRING, 0, (LPARAM)_T("타원"));
 	SendDlgItemMessage(hDlg, IDC_FIGURE, CB_ADDSTRING, 0, (LPARAM)_T("사각형"));
 	SendDlgItemMessage(hDlg, IDC_FIGURE, CB_ADDSTRING, 0, (LPARAM)_T("삼각형"));
+	SendDlgItemMessage(hDlg, IDC_FIGURE, CB_ADDSTRING, 0, (LPARAM)_T("직선"));
 
 	// 초기 도형 옵션은 "선"으로 설정 
 	SendDlgItemMessage(hDlg, IDC_FIGURE, CB_SETCURSEL, 1, 0);
@@ -124,6 +125,10 @@ void SelectFigureOption(HWND hDlg, int &g_currentSelectFigureOption)
 	// "삼각형" 모드 선택
 	case 4:
 		g_currentSelectFigureOption = MODE_TRIANGLE;
+		break;
+	// "직선" 모드 선택
+	case 5:
+		g_currentSelectFigureOption = MODE_STRAIGHT;
 		break;
 	}
 }
@@ -238,7 +243,7 @@ void DrawPolygonProcess(HWND hWnd, HDC& hDCMem, WPARAM wParam, LPARAM lParam, DR
 // 사각형을 특정 HDC에 그림
 void DrawRectangleInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam)
 {
-	// 중심점 찾기
+	// 시작과 끝점
 	int startX = LOWORD(wParam);
 	int startY = HIWORD(wParam);
 	int endX = LOWORD(lParam);
@@ -255,7 +260,7 @@ void DrawRectangleInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam)
 // 삼각형을 특정 HDC에 그림
 void DrawTriangleInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam)
 {	
-	// 중심점 찾기
+	// 시작과 끝점
 	int startX = LOWORD(wParam);
 	int startY = HIWORD(wParam);
 	int endX = LOWORD(lParam);
@@ -279,5 +284,22 @@ void DrawPolygonInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam, int type)
 	case MODE_TRIANGLE:
 		DrawTriangleInHDC(tHDC, wParam, lParam);
 		break;
+
+	case MODE_STRAIGHT:
+		DrawStraightInHDC(tHDC, wParam, lParam);
+		break;
 	}
+}
+
+// 직선을 특정 HDC에 그림
+void DrawStraightInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam)
+{
+	// 시작과 끝점
+	int startX = LOWORD(wParam);
+	int startY = HIWORD(wParam);
+	int endX = LOWORD(lParam);
+	int endY = HIWORD(lParam);
+
+	// 직선 그리기
+	DrawLineInHDC(tHDC, MAKEWPARAM(startX, startY), MAKELPARAM(endX, endY));
 }

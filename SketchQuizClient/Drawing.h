@@ -82,3 +82,6 @@ void DrawTriangleInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam);
 
 // 다각형을 특정 HDC에 그림
 void DrawPolygonInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam, int type);
+
+// 직선을 특정 HDC에 그림
+void DrawStraightInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam);
