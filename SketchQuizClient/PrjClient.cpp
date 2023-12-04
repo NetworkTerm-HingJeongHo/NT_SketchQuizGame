@@ -4,7 +4,8 @@
 _TCHAR input_result[256]; // input 결과 저장할 배열
 _TCHAR ID_NICKNAME[256]; // stdafx.h 파일에 같은 주소에 저장하기 위함
 HANDLE LoginProcessClientThread; // 로그인 프로세스 스레드, stdafx.h 파일에 같은 주소에 저장하기 위함
-
+char recvBuf[BUFSIZE]; // 데이터 받을 버퍼
+_TCHAR recvBuf_tchar[BUFSIZE]; // tchar로 받을 버퍼
 // 홈 창 변수
 int channel;	//udp 채널 가져오기. stdafx.h 파일에 같은 주소에 저장하기 위함
 
@@ -644,7 +645,7 @@ LRESULT CALLBACK ChildWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 
 // 로그인 윈도우 프로시저 (로그인 영역) -----------------------------------------------------------------------------------//
 LRESULT CALLBACK LoginWndProc(HWND hwndLogin, UINT msg, WPARAM wParam, LPARAM lParam) {
-
+	g_isDup == 0; //중복확인 비활성화
 	switch (msg) {
 
 	case WM_CREATE:
@@ -704,9 +705,9 @@ LRESULT CALLBACK LoginWndProc(HWND hwndLogin, UINT msg, WPARAM wParam, LPARAM lP
 			//CloseHandle(LoginProcessClientThread);
 			// ---------------------------- //
 			 
-			 
-			// 현재 있는 Id와, 입력한 아이디 와의 비교
-			if (_tcscmp(userId, input_result) == 0 && _tcscmp(userId, _T("")))
+			Sleep(1000);
+		// 현재 있는 Id와, 입력한 아이디 와의 비교
+			if (_tcscmp(recvBuf_tchar, _T("false")) == 0)
 			{
 				MessageBox(hwndLogin, _T("이미 있는 아이디입니다. 다른 아이디를 사용해주세요."), _T("중복 확인 결과"), MB_OK);
 
@@ -752,7 +753,7 @@ LRESULT CALLBACK HomeWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) 
 																							   //x,y,width,height
 		CreateWindow(_T("STATIC"), ID_NICKNAME, WS_VISIBLE | WS_CHILD | SS_CENTER | SS_CENTERIMAGE, 900, 10, 100, 30, hwnd, NULL, NULL, NULL); // 유저 id 출력
 		CreateWindow(_T("STATIC"), _T("님 반갑습니다!"), WS_VISIBLE | WS_CHILD | SS_CENTER | SS_CENTERIMAGE, 1000, 10, 200, 30, hwnd, NULL, NULL, NULL); // id 님 반갑습니다!
-		CreateWindow(_T("STATIC"), _T("공자사항 내용"), WS_VISIBLE | WS_CHILD | SS_CENTER | SS_CENTERIMAGE, 50, 50, 1150, 100, hwnd, NULL, NULL, NULL); // 스케치퀴즈 타이틀
+		CreateWindow(_T("STATIC"), _T("~ 스케치 퀴즈 ~"), WS_VISIBLE | WS_CHILD | SS_CENTER | SS_CENTERIMAGE, 50, 50, 1150, 100, hwnd, NULL, NULL, NULL); // 스케치퀴즈 타이틀
 
 		CreateWindow(_T("BUTTON"), _T("공지 전송"), WS_VISIBLE | WS_CHILD, 1042, 185, 174, 54, hwnd, (HMENU)ID_NOTICE_BUTTON, NULL, NULL); // 공지 전송
 
@@ -765,6 +766,10 @@ LRESULT CALLBACK HomeWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) 
 
 		CreateWindow(_T("BUTTON"), _T("돌아가기"), WS_VISIBLE | WS_CHILD, 100, 100, 100, 30, hwnd, (HMENU)ID_BACKHOME_BUTTON, NULL, NULL); // 돌아가기
 		break;
+		//----//
+		//CreateWindow(_T("BUTTON"), _T("UDP 채널1 입장"), WS_VISIBLE | WS_CHILD, 300, 250, 640, 150, hwnd, (HMENU)ID_CHANNEL_B_BUTTON, NULL, NULL); // 채널 B 입장
+		//CreateWindow(_T("BUTTON"), _T("UDP 채널2 입장"), WS_VISIBLE | WS_CHILD, 300, 450, 640, 150, hwnd, (HMENU)ID_CHANNEL_RANDOM_BUTTON, NULL, NULL); // 랜덤 입장
+		//----//
 
 	case WM_COMMAND:
 		// 버튼 클릭 이벤트 처리
@@ -964,8 +969,8 @@ DWORD WINAPI LoginProcessClient(LPVOID arg)
 	}
 
 	
-	char recvBuf[BUFSIZE]; // 데이터 받을 버퍼
-	_TCHAR recvBuf_tchar[BUFSIZE]; // tchar로 받을 버퍼
+	//char recvBuf[BUFSIZE]; // 데이터 받을 버퍼
+	//_TCHAR recvBuf_tchar[BUFSIZE]; // tchar로 받을 버퍼
 	while (1) {
 
 		// 데이터 받기

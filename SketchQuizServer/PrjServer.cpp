@@ -270,20 +270,31 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 						printf("[TCP] TYPE_ID, 현재 소켓 닉네임 등록완료 : %s\n", ptr->id_nickname_char);
 						printf("[TCP] TYPE_ID, 현재 소켓 port 등록완료 : %d\n", ptr->sin_port);
 						printf("[TCP] TYPE_ID, 현재 소켓 주소(char) : %s\n", inet_ntoa(ptr->sin_addr));
-						MessageBox(NULL, ptr->id_nickname, _T("현재 소켓 닉네임 등록완료(_TCHAR)"), MB_ICONERROR);
+						//MessageBox(NULL, ptr->id_nickname, _T("현재 소켓 닉네임 등록완료(_TCHAR)"), MB_ICONERROR);
 						// =========== 지윤 ============
 						AddClientToListView(ptr->sin_port, ptr->id_nickname);
 						// =============================
-						size_t dataSize = strlen("중복된다잉");
-						retval = send(ptr->sock, "중복된다잉", dataSize, 0);
+						// ---- 클라이언트로 전송 ------//
+						size_t dataSize = strlen("true"); // 중복이 아니므로, "true" 클라이언트로 전송
+						retval = send(ptr->sock, "true", dataSize, 0);
 
 						if (retval == SOCKET_ERROR) {
 							err_display("send()");
 							//break;
 						}
+						// ----------------------------//
 					}
 					else {	// id 중복이 있다면, 등록 실패
 						printf("[TCP] ID가 중복됩니다. 등록 실패입니다.");
+						// ---- 클라이언트로 전송 ------//
+						size_t dataSize = strlen("false"); //중복이므로, "false" 클라이언트에 전송
+						retval = send(ptr->sock, "false", dataSize, 0);
+
+						if (retval == SOCKET_ERROR) {
+							err_display("send()");
+							//break;
+						}
+						// ----------------------------//
 					}
 
 					break;
