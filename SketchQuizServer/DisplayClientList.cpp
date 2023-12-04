@@ -20,7 +20,7 @@ void InitializeListView(HWND hWnd) {
     ListView_InsertColumn(g_hListView, 1, &lvc2);
 }
 
-void AddClientToListView(int port, const char* id) {
+void AddClientToListView(int port, _TCHAR* id) {
     LVITEM lvItem = { 0 };
     lvItem.mask = LVIF_TEXT | LVIF_PARAM;
     lvItem.iItem = 0;
@@ -35,12 +35,8 @@ void AddClientToListView(int port, const char* id) {
     // 첫 번째 열에 포트 번호 추가
     int index = ListView_InsertItem(g_hListView, &lvItem);
 
-    // ID를 wchar_t로 변환
-    wchar_t idStrW[256];
-    mbstowcs(idStrW, id, strlen(id) + 1);
-
     // 두 번째 열에 ID 추가
-    ListView_SetItemText(g_hListView, index, 1, idStrW);
+    ListView_SetItemText(g_hListView, index, 1, id);
 }
 
 // 클라이언트 목록을 윈도우 창에 표시
