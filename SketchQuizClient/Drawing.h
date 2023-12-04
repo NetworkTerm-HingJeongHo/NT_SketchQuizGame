@@ -21,8 +21,8 @@ typedef struct _DRAWELLIPSE_MSG
 	char dummy[SIZE_TOT - 7 * sizeof(int)];
 } DRAWELLIPSE_MSG;
 
-// 사각형
-typedef struct _DRAWRECTANGLE_MSG
+// 다각형
+typedef struct _DRAWPOLYGON_MSG
 {
 	int type;
 	int width;
@@ -30,7 +30,7 @@ typedef struct _DRAWRECTANGLE_MSG
 	int startX, startY;
 	int endX, endY;
 	char dummy[SIZE_TOT - 7 * sizeof(int)];
-} DRAWRECTANGLE_MSG;
+} DRAWPOLYGON_MSG;
 
 // 그림 세부 정보에 대한 구조체
 typedef struct _DRAW_DETAIL_INFORMATION
@@ -70,3 +70,15 @@ void DrawLineProcess(HWND hWnd, HDC& hDCMem, WPARAM wParam, LPARAM lParam, DRAW_
 
 // 선을 특정 HDC에 그림
 void DrawLineInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam);
+
+// 다각형 그리는 과정 실행
+void DrawPolygonProcess(HWND hWnd, HDC& hDCMem, WPARAM wParam, LPARAM lParam, DRAW_DETAIL_INFORMATION drawDetailInformation, int type);
+
+// 사각형을 특정 HDC에 그림
+void DrawRectangleInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam);
+
+// 삼각형을 특정 HDC에 그림
+void DrawTriangleInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam);
+
+// 다각형을 특정 HDC에 그림
+void DrawPolygonInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam, int type);
