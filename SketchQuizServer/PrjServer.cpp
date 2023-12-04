@@ -35,7 +35,7 @@ int main(int argc, char* argv[])
 
 	// 임시 윈도우 생성
 	HWND hWnd = CreateWindow(_T("MyWndClass"), _T("TCP 서버"), WS_OVERLAPPEDWINDOW,
-		0, 0, 600, 400, NULL, NULL, NULL, NULL);
+		0, 0, 600, 300, NULL, NULL, NULL, NULL);
 	if (hWnd == NULL) return 1;
 	ShowWindow(hWnd, SW_SHOWNORMAL);
 	UpdateWindow(hWnd);
