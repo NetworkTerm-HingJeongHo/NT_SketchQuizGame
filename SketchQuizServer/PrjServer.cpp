@@ -226,7 +226,12 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		else {
 			// 접속한 클라이언트 정보 출력
 			printf("\n[TCP/IPv4 서버] 클라이언트 접속: IP 주소=%s, 포트 번호=%d\n", 
-				inet_ntoa(clientaddr.sin_addr), ntohs(clientaddr.sin_port));	
+				inet_ntoa(clientaddr.sin_addr), ntohs(clientaddr.sin_port));
+
+			// ========= 지윤 =========
+			tmp_clientSock = client_sock;
+			// ========================
+			
 			// 소켓 정보 추가
 			AddSocketInfoTCP(client_sock);
 			retval = WSAAsyncSelect(client_sock, hWnd,
@@ -235,8 +240,6 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				err_display("WSAAsyncSelect()");
 				RemoveSocketInfo(client_sock);
 			}
-
-
 		}
 		break;
 	case FD_READ:
@@ -388,6 +391,7 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		break;
 	case FD_CLOSE:
 		RemoveSocketInfo(wParam);
+	
 		break;
 	}
 }
@@ -460,7 +464,6 @@ bool AddSocketInfoTCP(SOCKET sock)
 // 소켓 정보 삭제
 void RemoveSocketInfo(SOCKET sock)
 {
-
 	// 클라이언트 정보 얻기
 	struct sockaddr_in clientaddr;
 	int addrlen = sizeof(clientaddr);
@@ -472,7 +475,6 @@ void RemoveSocketInfo(SOCKET sock)
 		addr, ntohs(clientaddr.sin_port));
 	// =========== 지윤 ============
 	RemoveClientFromListView(ntohs(clientaddr.sin_port));
-	DisplayClientList();
 	// =============================
 
 	// 클라이언트 소켓 제거
