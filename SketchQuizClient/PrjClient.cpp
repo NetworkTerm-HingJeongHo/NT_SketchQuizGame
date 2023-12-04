@@ -538,10 +538,27 @@ LRESULT CALLBACK ChildWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 
 			// "사각형" 그리기 모드
 			case MODE_RECTANGLE:
+				g_drawpolygonmsg.type = TYPE_DRAWRECTANGLE;
+				g_drawpolygonmsg.startX = x0;
+				g_drawpolygonmsg.startY = y0;
+				g_drawpolygonmsg.endX = LOWORD(lParam);
+				g_drawpolygonmsg.endY = HIWORD(lParam);
+				g_drawpolygonmsg.color = g_clientDrawDetailInformation.color;
+				g_drawpolygonmsg.width = g_clientDrawDetailInformation.width;
+				sendn(g_sock, (char*)&g_drawpolygonmsg, SIZE_TOT, 0, serveraddr, g_isUDP);
 				break;
 
 			// "삼각형" 그리기 모드
 			case MODE_TRIANGLE:
+				// 삼각형일 때만 설정
+				g_drawpolygonmsg.type = TYPE_DRAWTRIANGLE;
+				g_drawpolygonmsg.startX = x0;
+				g_drawpolygonmsg.startY = y0;
+				g_drawpolygonmsg.endX = LOWORD(lParam);
+				g_drawpolygonmsg.endY = HIWORD(lParam);
+				g_drawpolygonmsg.color = g_clientDrawDetailInformation.color;
+				g_drawpolygonmsg.width = g_clientDrawDetailInformation.width;
+				sendn(g_sock, (char*)&g_drawpolygonmsg, SIZE_TOT, 0, serveraddr, g_isUDP);
 				break;
 			default:
 				break;
@@ -563,6 +580,14 @@ LRESULT CALLBACK ChildWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 	// 특정 부분 조금 지우기 윈도우 메시지 받음
 	case WM_ERASEALITTLE:
 		DrawLineProcess(hWnd, hDCMem, wParam, lParam, g_serverDrawDetailInformation);
+		return 0;
+
+	case WM_DRAWRECTANGLE:
+		DrawPolygonProcess(hWnd, hDCMem, wParam, lParam, g_serverDrawDetailInformation, MODE_RECTANGLE);
+
+		return 0;
+	case WM_DRAWTRIAGNGLE:
+		DrawPolygonProcess(hWnd, hDCMem, wParam, lParam, g_serverDrawDetailInformation, MODE_TRIANGLE);
 		return 0;
 	//
 	case WM_ERASEPIC:
@@ -1151,6 +1176,7 @@ DWORD WINAPI ReadThread(LPVOID arg)
 
 	// ====== 정호 ========
 	DRAWELLIPSE_MSG* drawEllipse_msg;
+	DRAWPOLYGON_MSG* drawPolygon_msg;
 	int serveraddrLen;
 	int len;
 	//
@@ -1256,6 +1282,24 @@ DWORD WINAPI ReadThread(LPVOID arg)
 			SendMessage(g_hDrawWnd, WM_DRAWELLIPSE,
 				MAKEWPARAM(drawEllipse_msg->x0, drawEllipse_msg->y0),
 				MAKELPARAM(drawEllipse_msg->x1, drawEllipse_msg->y1));
+			break;
+
+		// 다각형 그리기
+		case TYPE_DRAWRECTANGLE:
+			drawPolygon_msg = (DRAWPOLYGON_MSG*)&comm_msg;
+			g_serverDrawDetailInformation.width = drawPolygon_msg->width;
+			g_serverDrawDetailInformation.color = drawPolygon_msg->color;
+			SendMessage(g_hDrawWnd, WM_DRAWRECTANGLE,
+				MAKEWPARAM(drawPolygon_msg->startX, drawPolygon_msg->startY),
+				MAKELPARAM(drawPolygon_msg->endX, drawPolygon_msg->endY));
+			break;
+		case TYPE_DRAWTRIANGLE:
+			drawPolygon_msg = (DRAWPOLYGON_MSG*)&comm_msg;
+			g_serverDrawDetailInformation.width = drawPolygon_msg->width;
+			g_serverDrawDetailInformation.color = drawPolygon_msg->color;
+			SendMessage(g_hDrawWnd, WM_DRAWTRIAGNGLE,
+				MAKEWPARAM(drawPolygon_msg->startX, drawPolygon_msg->startY),
+				MAKELPARAM(drawPolygon_msg->endX, drawPolygon_msg->endY));
 			break;
 		case TYPE_ERASEPIC:
 			erasepic_msg = (ERASEPIC_MSG*)&comm_msg;

@@ -216,3 +216,68 @@ void DrawLineInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam)
 	MoveToEx(tHDC, LOWORD(wParam), HIWORD(wParam), NULL);
 	LineTo(tHDC, LOWORD(lParam), HIWORD(lParam));
 }
+
+// 다각형 그리는 과정 실행
+void DrawPolygonProcess(HWND hWnd, HDC& hDCMem, WPARAM wParam, LPARAM lParam, DRAW_DETAIL_INFORMATION drawDetailInformation, int type)
+{
+	HDC hDC = GetDC(hWnd);
+	HPEN hPen = CreatePen(PS_SOLID, drawDetailInformation.width, drawDetailInformation.color);
+	// 윈도우 화면에 다각형을 1차로 그리기
+	HPEN hOldPen = (HPEN)SelectObject(hDC, hPen);
+	DrawPolygonInHDC(hDC, wParam, lParam, type);
+	SelectObject(hDC, hOldPen);
+	// 배경 비트맵에 다각형을 2차로 그리기
+	hOldPen = (HPEN)SelectObject(hDCMem, hPen);
+	DrawPolygonInHDC(hDCMem, wParam, lParam, type);
+	SelectObject(hDCMem, hOldPen);
+	// 화면 출력용 DC와 Pen 핸들 해제
+	DeleteObject(hPen);
+	ReleaseDC(hWnd, hDC);
+}
+
+// 사각형을 특정 HDC에 그림
+void DrawRectangleInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam)
+{
+	// 중심점 찾기
+	int startX = LOWORD(wParam);
+	int startY = HIWORD(wParam);
+	int endX = LOWORD(lParam);
+	int endY = HIWORD(lParam);
+	
+	// 사각형 4변 그리기
+	DrawLineInHDC(tHDC, MAKEWPARAM(startX, startY), MAKELPARAM(endX, startY));
+	DrawLineInHDC(tHDC, MAKEWPARAM(endX, startY), MAKELPARAM(endX, endY));
+	DrawLineInHDC(tHDC, MAKEWPARAM(endX, endY), MAKELPARAM(startX, endY));
+	DrawLineInHDC(tHDC, MAKEWPARAM(startX, endY), MAKELPARAM(startX, startY));
+
+}
+
+// 삼각형을 특정 HDC에 그림
+void DrawTriangleInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam)
+{	
+	// 중심점 찾기
+	int startX = LOWORD(wParam);
+	int startY = HIWORD(wParam);
+	int endX = LOWORD(lParam);
+	int endY = HIWORD(lParam);
+
+	// 삼각형 3번 그리기
+	DrawLineInHDC(tHDC, MAKEWPARAM(startX, startY), MAKELPARAM(endX, startY));
+	DrawLineInHDC(tHDC, MAKEWPARAM(endX, startY), MAKELPARAM((startX + endX) / 2, endY));
+	DrawLineInHDC(tHDC, MAKEWPARAM((startX + endX) / 2, endY), MAKELPARAM(startX, startY));
+}
+
+// 다각형을 특정 HDC에 그림
+void DrawPolygonInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam, int type)
+{
+	switch (type)
+	{
+	case MODE_RECTANGLE:
+		DrawRectangleInHDC(tHDC, wParam, lParam);
+		break;
+
+	case MODE_TRIANGLE:
+		DrawTriangleInHDC(tHDC, wParam, lParam);
+		break;
+	}
+}
