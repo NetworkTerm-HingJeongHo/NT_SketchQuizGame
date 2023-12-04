@@ -28,7 +28,7 @@ typedef struct _SOCKETINFO
 	// ===== 지안 ====== 
 	USHORT sin_port;	// 소켓 포트 번호
 	IN_ADDR sin_addr;	// 소켓 ip 주소 
-	CHAR id_nickname_char[BUFSIZE]; // 사용자 닉네임 char 버전.
+	char id_nickname_char[BUFSIZE]; // 사용자 닉네임 char 버전.
 
 	// ===== 연경 ======
 	_TCHAR id_nickname[BUFSIZE]; // 사용자 닉네임
