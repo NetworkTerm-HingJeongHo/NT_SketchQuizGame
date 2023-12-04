@@ -261,6 +261,13 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 						AddClientToListView(ptr->sin_port, ptr->id_nickname);
 						DisplayClientList();
 						// =============================
+						size_t dataSize = strlen("중복된다잉");
+						retval = send(ptr->sock, "중복된다잉", dataSize, 0);
+
+						if (retval == SOCKET_ERROR) {
+							err_display("send()");
+							//break;
+						}
 					}
 					else {	// id 중복이 있다면, 등록 실패
 						printf("[TCP] ID가 중복됩니다. 등록 실패입니다.");
