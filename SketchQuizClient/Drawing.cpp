@@ -94,6 +94,8 @@ void AddFigureOption(HWND hDlg)
 	SendDlgItemMessage(hDlg, IDC_FIGURE, CB_ADDSTRING, 0, (LPARAM)_T("사각형"));
 	SendDlgItemMessage(hDlg, IDC_FIGURE, CB_ADDSTRING, 0, (LPARAM)_T("삼각형"));
 	SendDlgItemMessage(hDlg, IDC_FIGURE, CB_ADDSTRING, 0, (LPARAM)_T("직선"));
+	SendDlgItemMessage(hDlg, IDC_FIGURE, CB_ADDSTRING, 0, (LPARAM)_T("오각형"));
+	SendDlgItemMessage(hDlg, IDC_FIGURE, CB_ADDSTRING, 0, (LPARAM)_T("별"));
 
 	// 초기 도형 옵션은 "선"으로 설정 
 	SendDlgItemMessage(hDlg, IDC_FIGURE, CB_SETCURSEL, 1, 0);
@@ -129,6 +131,14 @@ void SelectFigureOption(HWND hDlg, int &g_currentSelectFigureOption)
 	// "직선" 모드 선택
 	case 5:
 		g_currentSelectFigureOption = MODE_STRAIGHT;
+		break;
+	// "오각형" 모드 선택
+	case 6:
+		g_currentSelectFigureOption = MODE_PENTAGON;
+		break;
+	// "별" 모드 선택
+	case 7:
+		g_currentSelectFigureOption = MODE_STAR;
 		break;
 	}
 }
@@ -181,7 +191,7 @@ void DrawEllipseInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam)
 	for (int i = 0; i <= 360; i++)
 	{
 		// 타원 공식 적용
-		angle = 2 * 3.1416 * i / 360;
+		angle = 2 * PI * i / 360;
 		newX = centerX + ellipseAxisX * cos(angle);
 		newY = centerY + ellipseAxisY * sin(angle);
 
@@ -288,6 +298,14 @@ void DrawPolygonInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam, int type)
 	case MODE_STRAIGHT:
 		DrawStraightInHDC(tHDC, wParam, lParam);
 		break;
+
+	case MODE_PENTAGON:
+		DrawPentagonInHDC(tHDC, wParam, lParam);
+		break;
+
+	case MODE_STAR:
+		DrawStarInHDC(tHDC, wParam, lParam);
+		break;
 	}
 }
 
@@ -302,4 +320,65 @@ void DrawStraightInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam)
 
 	// 직선 그리기
 	DrawLineInHDC(tHDC, MAKEWPARAM(startX, startY), MAKELPARAM(endX, endY));
+}
+
+// 오각형을 특정 HDC에 그림
+void DrawPentagonInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam)
+{
+	// 시작과 끝점
+	int startX = LOWORD(wParam);
+	int startY = HIWORD(wParam);
+	int endX = LOWORD(lParam);
+	int endY = HIWORD(lParam);
+
+	int centerX = (startX + endX) / 2;
+	int centerY = (startY + endY) / 2;
+	int radius = centerX - startX;
+	
+	int** positions;
+	GetPositionByPoints(positions, 5, centerX, centerY, radius);
+	// 오각형 그리기
+	DrawLineInHDC(tHDC, MAKEWPARAM(positions[0][1], positions[0][0]), MAKELPARAM(positions[1][1], positions[1][0]));
+	DrawLineInHDC(tHDC, MAKEWPARAM(positions[1][1], positions[1][0]), MAKELPARAM(positions[2][1], positions[2][0]));
+	DrawLineInHDC(tHDC, MAKEWPARAM(positions[2][1], positions[2][0]), MAKELPARAM(positions[3][1], positions[3][0]));
+	DrawLineInHDC(tHDC, MAKEWPARAM(positions[3][1], positions[3][0]), MAKELPARAM(positions[4][1], positions[4][0]));
+	DrawLineInHDC(tHDC, MAKEWPARAM(positions[4][1], positions[4][0]), MAKELPARAM(positions[0][1], positions[0][0]));
+	
+	
+}
+
+// 별을 특정 HDC에 그림
+void DrawStarInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam)
+{
+	// 시작과 끝점
+	int startX = LOWORD(wParam);
+	int startY = HIWORD(wParam);
+	int endX = LOWORD(lParam);
+	int endY = HIWORD(lParam);
+
+	int centerX = (startX + endX) / 2;
+	int centerY = (startY + endY) / 2;
+	int radius = centerX - startX;
+
+	int** positions;
+	GetPositionByPoints(positions, 5, centerX, centerY, radius);
+	// 오각형 그리기
+	DrawLineInHDC(tHDC, MAKEWPARAM(positions[0][1], positions[0][0]), MAKELPARAM(positions[2][1], positions[2][0]));
+	DrawLineInHDC(tHDC, MAKEWPARAM(positions[2][1], positions[2][0]), MAKELPARAM(positions[4][1], positions[4][0]));
+	DrawLineInHDC(tHDC, MAKEWPARAM(positions[4][1], positions[4][0]), MAKELPARAM(positions[1][1], positions[1][0]));
+	DrawLineInHDC(tHDC, MAKEWPARAM(positions[1][1], positions[1][0]), MAKELPARAM(positions[3][1], positions[3][0]));
+	DrawLineInHDC(tHDC, MAKEWPARAM(positions[3][1], positions[3][0]), MAKELPARAM(positions[0][1], positions[0][0]));
+}
+
+// 포인트 개수에 따라 일정 각도별 위치들 반환
+void GetPositionByPoints(int**& positions, int points, int centerX, int centerY, int radius)
+{
+	positions = (int**)malloc(points * sizeof(int*));
+
+	for (int i = 0; i < points; i++)
+	{
+		positions[i] = (int*)malloc(2 * sizeof(int));
+		positions[i][0] = centerY + radius * sin(2 * PI * (360 / points) * i / 360 + 60);
+		positions[i][1] = centerX + radius * cos(2 * PI * (360 / points) * i / 360 + 60);
+	}
 }

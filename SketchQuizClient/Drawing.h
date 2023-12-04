@@ -9,6 +9,8 @@ static _TCHAR*		drawingUserID;
 // 타입 정의
 // ======================= 정호 =======================
 
+#define PI	3.1416
+
 // 타원
 // sizeof(DRAWELLIPSE_MSG) == 256
 typedef struct _DRAWELLIPSE_MSG
@@ -85,3 +87,12 @@ void DrawPolygonInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam, int type);
 
 // 직선을 특정 HDC에 그림
 void DrawStraightInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam);
+
+// 오각형을 특정 HDC에 그림
+void DrawPentagonInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam);
+
+// 별을 특정 HDC에 그림
+void DrawStarInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam);
+
+// 포인트 개수에 따라 일정 각도별 위치들 반환
+void GetPositionByPoints(int**& positions, int points, int centerX, int centerY, int radius);
