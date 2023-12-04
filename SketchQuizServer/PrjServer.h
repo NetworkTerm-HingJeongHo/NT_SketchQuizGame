@@ -5,6 +5,9 @@
 #define SERVERPORT 9000
 #define BUFSIZE    256
 
+// =========== ÁöÀ± =============
+#define CLIENTOUT 3001
+
 // ==== ¿¬°æ ====
 #define TYPE_CHAT   1000
 // =============

@@ -18,6 +18,9 @@ void InitializeListView(HWND hWnd) {
     lvc2.cx = 100;  // 두 번째 열의 너비 설정
     lvc2.pszText = (LPWSTR)_T("User ID");  // 두 번째 열에 "User ID" 표시
     ListView_InsertColumn(g_hListView, 1, &lvc2);
+
+    // ListView의 선택 모드를 활성화
+    ListView_SetExtendedListViewStyle(g_hListView, LVS_EX_FULLROWSELECT);
 }
 
 void AddClientToListView(int port, _TCHAR* id) {
@@ -30,13 +33,13 @@ void AddClientToListView(int port, _TCHAR* id) {
     wchar_t portStrW[10];
     swprintf(portStrW, sizeof(portStrW) / sizeof(portStrW[0]), _T("%d"), port);
     lvItem.pszText = portStrW;
-    lvItem.lParam = port; // 포트 번호 저장
 
     // 첫 번째 열에 포트 번호 추가
     int index = ListView_InsertItem(g_hListView, &lvItem);
 
     // 두 번째 열에 ID 추가
     ListView_SetItemText(g_hListView, index, 1, id);
+    DisplayClientList();
 }
 
 // 클라이언트 목록을 윈도우 창에 표시
@@ -57,4 +60,5 @@ void RemoveClientFromListView(int port) {
     if (index != -1) {
         ListView_DeleteItem(g_hListView, index);
     }
+    DisplayClientList();
 }

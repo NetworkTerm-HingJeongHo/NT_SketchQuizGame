@@ -164,9 +164,23 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		switch (LOWORD(wParam))
 		{
 		case CLIENTOUT:
+			if (g_selectedIndex != -1) {
+				// 선택한 클라이언트를 제거하는 코드 추가
+				int portToRemove = g_selectedIndex;
+				RemoveClientFromListView(portToRemove);
+
+				// 선택을 해제하고 g_selectedIndex를 초기화
+				ListView_SetItemState(g_hListView, g_selectedIndex, 0, LVIS_SELECTED);
+				g_selectedIndex = -1;
+			}
 			break;
-		default:
-			break;
+		}
+		return 0;
+	case WM_NOTIFY:
+		if (((LPNMHDR)lParam)->code == NM_CLICK) {
+			// ListView에서 클릭 이벤트를 처리하여 선택한 클라이언트의 인덱스를 저장
+			NMITEMACTIVATE* pnmia = (NMITEMACTIVATE*)lParam;
+			g_selectedIndex = pnmia->iItem;
 		}
 		return 0;
 		// =============================
@@ -259,7 +273,6 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 						MessageBox(NULL, ptr->id_nickname, _T("현재 소켓 닉네임 등록완료(_TCHAR)"), MB_ICONERROR);
 						// =========== 지윤 ============
 						AddClientToListView(ptr->sin_port, ptr->id_nickname);
-						DisplayClientList();
 						// =============================
 						size_t dataSize = strlen("중복된다잉");
 						retval = send(ptr->sock, "중복된다잉", dataSize, 0);
