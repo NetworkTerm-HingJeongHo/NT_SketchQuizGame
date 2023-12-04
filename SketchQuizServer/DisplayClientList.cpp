@@ -3,7 +3,7 @@
 void InitializeListView(HWND hWnd) {
     g_hListView = CreateWindowEx(0, WC_LISTVIEW, _T("Client List"),
         WS_CHILD | WS_VISIBLE | WS_BORDER | LVS_REPORT | LVS_SINGLESEL,
-        10, 10, 200, 320, hWnd, NULL, NULL, NULL);
+        10, 10, 200, 200, hWnd, NULL, NULL, NULL);
 
     // 첫 번째 열 추가
     LVCOLUMN lvc1;
