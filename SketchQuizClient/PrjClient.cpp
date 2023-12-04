@@ -538,11 +538,40 @@ LRESULT CALLBACK ChildWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 
 			// "사각형" 그리기 모드
 			case MODE_RECTANGLE:
+				g_drawpolygonmsg.type = TYPE_DRAWRECTANGLE;
+				g_drawpolygonmsg.startX = x0;
+				g_drawpolygonmsg.startY = y0;
+				g_drawpolygonmsg.endX = LOWORD(lParam);
+				g_drawpolygonmsg.endY = HIWORD(lParam);
+				g_drawpolygonmsg.color = g_clientDrawDetailInformation.color;
+				g_drawpolygonmsg.width = g_clientDrawDetailInformation.width;
+				sendn(g_sock, (char*)&g_drawpolygonmsg, SIZE_TOT, 0, serveraddr, g_isUDP);
 				break;
 
 			// "삼각형" 그리기 모드
 			case MODE_TRIANGLE:
+				g_drawpolygonmsg.type = TYPE_DRAWTRIANGLE;
+				g_drawpolygonmsg.startX = x0;
+				g_drawpolygonmsg.startY = y0;
+				g_drawpolygonmsg.endX = LOWORD(lParam);
+				g_drawpolygonmsg.endY = HIWORD(lParam);
+				g_drawpolygonmsg.color = g_clientDrawDetailInformation.color;
+				g_drawpolygonmsg.width = g_clientDrawDetailInformation.width;
+				sendn(g_sock, (char*)&g_drawpolygonmsg, SIZE_TOT, 0, serveraddr, g_isUDP);
 				break;
+
+			// "직선" 그리기 모드
+			case MODE_STRAIGHT:
+				g_drawpolygonmsg.type = TYPE_DRAWSTRAIGHT;
+				g_drawpolygonmsg.startX = x0;
+				g_drawpolygonmsg.startY = y0;
+				g_drawpolygonmsg.endX = LOWORD(lParam);
+				g_drawpolygonmsg.endY = HIWORD(lParam);
+				g_drawpolygonmsg.color = g_clientDrawDetailInformation.color;
+				g_drawpolygonmsg.width = g_clientDrawDetailInformation.width;
+				sendn(g_sock, (char*)&g_drawpolygonmsg, SIZE_TOT, 0, serveraddr, g_isUDP);
+				break;
+
 			default:
 				break;
 			}
@@ -564,6 +593,23 @@ LRESULT CALLBACK ChildWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 	case WM_ERASEALITTLE:
 		DrawLineProcess(hWnd, hDCMem, wParam, lParam, g_serverDrawDetailInformation);
 		return 0;
+
+	// 사각형 그리기 메시지 받음
+	case WM_DRAWRECTANGLE:
+		DrawPolygonProcess(hWnd, hDCMem, wParam, lParam, g_serverDrawDetailInformation, MODE_RECTANGLE);
+
+		return 0;
+
+	// 삼각형 그리기 메시지 받음
+	case WM_DRAWTRIAGNGLE:
+		DrawPolygonProcess(hWnd, hDCMem, wParam, lParam, g_serverDrawDetailInformation, MODE_TRIANGLE);
+		return 0;
+	
+	// 직선 그리기 메시지 받음
+	case WM_DRAWSTRAIGHT:
+		DrawPolygonProcess(hWnd, hDCMem, wParam, lParam, g_serverDrawDetailInformation, MODE_STRAIGHT);
+		return 0;
+		
 	//
 	case WM_ERASEPIC:
 		// 배경 비트맵 흰색으로 채움
@@ -917,65 +963,34 @@ DWORD WINAPI LoginProcessClient(LPVOID arg)
 		//break;
 	}
 
-	/*
+	
 	char recvBuf[BUFSIZE]; // 데이터 받을 버퍼
+	_TCHAR recvBuf_tchar[BUFSIZE]; // tchar로 받을 버퍼
 	while (1) {
 
 		// 데이터 받기
-		retval = recvn(g_sock, (char*)&recvBuf, BUFSIZE, 0, serveraddr, false); //TCP가 보낸 서버 받기.
-		//retval = recvn(g_sock, buf, retval, 0); // retval를 다시 넣은 이유 : 내가 보낸만큼 다시 받기 위해서이다. (10byte보냈으면 10만큼 받게 N을 설정해준거)
+		retval = recv(g_sock, recvBuf, BUFSIZE, 0);
 		if (retval == SOCKET_ERROR) {
 			err_display("recv()");
-			break;
+			return 0;
 		}
 		//else if (retval == 0)
 		//	break;
 		// 받은 데이터 출력
 		recvBuf[retval] = '\0';
-		printf("[TCP 클라이언트] %d바이트를 받았습니다.\n", retval);
-		printf("[받은 데이터] %s\n", recvBuf);
-		MessageBox(NULL, _T("지안이가 구현중인 UDP 채널1 IPv4 클라이언트 소켓임"), _T("알림"), MB_ICONERROR);
+		//printf("[TCP 클라이언트] %d바이트를 받았습니다.\n", retval);
+		//printf("[받은 데이터] %s\n", recvBuf);
+		MultiByteToWideChar(CP_ACP, 0, recvBuf, -1, recvBuf_tchar, BUFSIZE); // char* 형 문자열을 _TCHAR 형 문자열로 변환
+		MessageBox(NULL, recvBuf_tchar, _T("TCP 데이터를 받았어요"), MB_ICONERROR);
+
 	}
-	*/
+	
 
 	if (retval == SOCKET_ERROR)
 		return 0;
 
 	return 0;
-	/*
-	//// 서버와 데이터 통신
-	while (1) {
-	//	// 데이터 보내기
-		retval = send(g_sock, buf, strlen(buf), 0);
-		if (retval == SOCKET_ERROR) {
-			err_display("send()");
-			//break;
-		}
-		printf("[TCP 클라이언트] %d바이트를 보냈습니다.\n", retval);
 
-		// 데이터 받기
-		retval = recvn(g_sock, (char*)&buf, BUFSIZE, 0, serveraddr, false); //
-		//retval = recvn(g_sock, buf, retval, 0); // retval를 다시 넣은 이유 : 내가 보낸만큼 다시 받기 위해서이다. (10byte보냈으면 10만큼 받게 N을 설정해준거)
-		if (retval == SOCKET_ERROR) {
-			err_display("recv()");
-			//break;
-		}
-		else if (retval == 0)
-			//break;
-
-		// 받은 데이터 출력
-		buf[retval] = '\0';
-		printf("[TCP 클라이언트] %d바이트를 받았습니다.\n", retval);
-		printf("[받은 데이터] %s\n", buf);
-	}
-
-	//HANDLE hThread[2];
-
-	//hThread[1] = CreateThread(NULL, 0, LoginProcessClient, (LPVOID)1, 0, NULL);
-	//WaitForMultipleObjects(2, hThread, TRUE, INFINITE);
-	// //윈속 종료
-	//WSACleanup();
-	*/
 
 }
 
@@ -1020,7 +1035,7 @@ DWORD WINAPI ClientMain(LPVOID arg)
 		
 		//--------------------- UDP 서버 1 ----------------------//
 		if (channel == CHANNEL_UDP1) { //UDP 채널 1 이라면
-			MessageBox(NULL, _T("지안이가 구현중인 UDP 채널1 IPv4 클라이언트 소켓임"), _T("알림"), MB_ICONERROR);
+			//MessageBox(NULL, _T("지안이가 구현중인 UDP 채널1 IPv4 클라이언트 소켓임"), _T("알림"), MB_ICONERROR);
 			// socket()
 			g_sock = socket(AF_INET, SOCK_DGRAM, 0);
 			if (g_sock == INVALID_SOCKET) err_quit("socket()");
@@ -1060,7 +1075,7 @@ DWORD WINAPI ClientMain(LPVOID arg)
 
 		//--------------------- UDP 서버 2 ----------------------//
 		else if (channel == CHANNEL_UDP2) { //UDP 채널 2라면
-			MessageBox(NULL, _T("지안이가 구현중인 UDP 채널2 IPv4 클라이언트 소켓임"), _T("알림"), MB_ICONERROR);
+			//MessageBox(NULL, _T("지안이가 구현중인 UDP 채널2 IPv4 클라이언트 소켓임"), _T("알림"), MB_ICONERROR);
 			// socket()
 			g_sock = socket(AF_INET, SOCK_DGRAM, 0);
 			if (g_sock == INVALID_SOCKET) err_quit("socket()");
@@ -1151,6 +1166,7 @@ DWORD WINAPI ReadThread(LPVOID arg)
 
 	// ====== 정호 ========
 	DRAWELLIPSE_MSG* drawEllipse_msg;
+	DRAWPOLYGON_MSG* drawPolygon_msg;
 	int serveraddrLen;
 	int len;
 	//
@@ -1257,6 +1273,37 @@ DWORD WINAPI ReadThread(LPVOID arg)
 				MAKEWPARAM(drawEllipse_msg->x0, drawEllipse_msg->y0),
 				MAKELPARAM(drawEllipse_msg->x1, drawEllipse_msg->y1));
 			break;
+
+		// 사각형 그리기
+		case TYPE_DRAWRECTANGLE:
+			drawPolygon_msg = (DRAWPOLYGON_MSG*)&comm_msg;
+			g_serverDrawDetailInformation.width = drawPolygon_msg->width;
+			g_serverDrawDetailInformation.color = drawPolygon_msg->color;
+			SendMessage(g_hDrawWnd, WM_DRAWRECTANGLE,
+				MAKEWPARAM(drawPolygon_msg->startX, drawPolygon_msg->startY),
+				MAKELPARAM(drawPolygon_msg->endX, drawPolygon_msg->endY));
+			break;
+
+		// 삼각형 그리기
+		case TYPE_DRAWTRIANGLE:
+			drawPolygon_msg = (DRAWPOLYGON_MSG*)&comm_msg;
+			g_serverDrawDetailInformation.width = drawPolygon_msg->width;
+			g_serverDrawDetailInformation.color = drawPolygon_msg->color;
+			SendMessage(g_hDrawWnd, WM_DRAWTRIAGNGLE,
+				MAKEWPARAM(drawPolygon_msg->startX, drawPolygon_msg->startY),
+				MAKELPARAM(drawPolygon_msg->endX, drawPolygon_msg->endY));
+			break;
+		
+		// 직선 그리기
+		case TYPE_DRAWSTRAIGHT:
+			drawPolygon_msg = (DRAWPOLYGON_MSG*)&comm_msg;
+			g_serverDrawDetailInformation.width = drawPolygon_msg->width;
+			g_serverDrawDetailInformation.color = drawPolygon_msg->color;
+			SendMessage(g_hDrawWnd, WM_DRAWSTRAIGHT,
+				MAKEWPARAM(drawPolygon_msg->startX, drawPolygon_msg->startY),
+				MAKELPARAM(drawPolygon_msg->endX, drawPolygon_msg->endY));
+			break;
+
 		case TYPE_ERASEPIC:
 			erasepic_msg = (ERASEPIC_MSG*)&comm_msg;
 			SendMessage(g_hDrawWnd, WM_ERASEPIC, 0, 0);
