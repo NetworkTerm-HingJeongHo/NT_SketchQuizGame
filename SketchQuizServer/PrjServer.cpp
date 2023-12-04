@@ -157,6 +157,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		// =========== 지윤 ============
 	case WM_CREATE:
 		InitializeListView(hWnd);
+		CreateWindow(_T("BUTTON"), _T("사용자 강제퇴장"), WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
+			10, 220, 200, 30, hWnd, (HMENU)CLIENTOUT, NULL, NULL);
+		return 0;
+	case WM_COMMAND:
+		switch (LOWORD(wParam))
+		{
+		case CLIENTOUT:
+			break;
+		default:
+			break;
+		}
 		return 0;
 		// =============================
 	case WM_SOCKET: // 소켓 관련 윈도우 메시지
