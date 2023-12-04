@@ -1,5 +1,7 @@
 #pragma once
 
+#define CLIENTOUT 3001
+
 static HWND g_hListView;
 
 void InitializeListView(HWND hWnd);
