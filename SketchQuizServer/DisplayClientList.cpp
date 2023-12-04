@@ -51,10 +51,12 @@ void DisplayClientList() {
 
 void RemoveClientFromListView(int port) {
     LVFINDINFO lvFindInfo;
-    lvFindInfo.flags = LVFI_PARAM;
+    lvFindInfo.flags = LVFI_STRING;
 
-    // 파라미터로 포트 번호를 검색에 사용
-    lvFindInfo.lParam = port;
+    // 포트 번호를 문자열로 변환하여 검색에 사용
+    wchar_t portStrW[10];
+    swprintf(portStrW, sizeof(portStrW) / sizeof(portStrW[0]), _T("%d"), port);
+    lvFindInfo.psz = portStrW;
 
     int index = ListView_FindItem(g_hListView, -1, &lvFindInfo);
     if (index != -1) {
