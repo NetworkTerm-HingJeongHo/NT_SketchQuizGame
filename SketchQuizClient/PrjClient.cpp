@@ -550,7 +550,6 @@ LRESULT CALLBACK ChildWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 
 			// "삼각형" 그리기 모드
 			case MODE_TRIANGLE:
-				// 삼각형일 때만 설정
 				g_drawpolygonmsg.type = TYPE_DRAWTRIANGLE;
 				g_drawpolygonmsg.startX = x0;
 				g_drawpolygonmsg.startY = y0;
@@ -560,6 +559,19 @@ LRESULT CALLBACK ChildWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 				g_drawpolygonmsg.width = g_clientDrawDetailInformation.width;
 				sendn(g_sock, (char*)&g_drawpolygonmsg, SIZE_TOT, 0, serveraddr, g_isUDP);
 				break;
+
+			// "직선" 그리기 모드
+			case MODE_STRAIGHT:
+				g_drawpolygonmsg.type = TYPE_DRAWSTRAIGHT;
+				g_drawpolygonmsg.startX = x0;
+				g_drawpolygonmsg.startY = y0;
+				g_drawpolygonmsg.endX = LOWORD(lParam);
+				g_drawpolygonmsg.endY = HIWORD(lParam);
+				g_drawpolygonmsg.color = g_clientDrawDetailInformation.color;
+				g_drawpolygonmsg.width = g_clientDrawDetailInformation.width;
+				sendn(g_sock, (char*)&g_drawpolygonmsg, SIZE_TOT, 0, serveraddr, g_isUDP);
+				break;
+
 			default:
 				break;
 			}
@@ -582,13 +594,22 @@ LRESULT CALLBACK ChildWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 		DrawLineProcess(hWnd, hDCMem, wParam, lParam, g_serverDrawDetailInformation);
 		return 0;
 
+	// 사각형 그리기 메시지 받음
 	case WM_DRAWRECTANGLE:
 		DrawPolygonProcess(hWnd, hDCMem, wParam, lParam, g_serverDrawDetailInformation, MODE_RECTANGLE);
 
 		return 0;
+
+	// 삼각형 그리기 메시지 받음
 	case WM_DRAWTRIAGNGLE:
 		DrawPolygonProcess(hWnd, hDCMem, wParam, lParam, g_serverDrawDetailInformation, MODE_TRIANGLE);
 		return 0;
+	
+	// 직선 그리기 메시지 받음
+	case WM_DRAWSTRAIGHT:
+		DrawPolygonProcess(hWnd, hDCMem, wParam, lParam, g_serverDrawDetailInformation, MODE_STRAIGHT);
+		return 0;
+		
 	//
 	case WM_ERASEPIC:
 		// 배경 비트맵 흰색으로 채움
@@ -1284,7 +1305,7 @@ DWORD WINAPI ReadThread(LPVOID arg)
 				MAKELPARAM(drawEllipse_msg->x1, drawEllipse_msg->y1));
 			break;
 
-		// 다각형 그리기
+		// 사각형 그리기
 		case TYPE_DRAWRECTANGLE:
 			drawPolygon_msg = (DRAWPOLYGON_MSG*)&comm_msg;
 			g_serverDrawDetailInformation.width = drawPolygon_msg->width;
@@ -1293,6 +1314,8 @@ DWORD WINAPI ReadThread(LPVOID arg)
 				MAKEWPARAM(drawPolygon_msg->startX, drawPolygon_msg->startY),
 				MAKELPARAM(drawPolygon_msg->endX, drawPolygon_msg->endY));
 			break;
+
+		// 삼각형 그리기
 		case TYPE_DRAWTRIANGLE:
 			drawPolygon_msg = (DRAWPOLYGON_MSG*)&comm_msg;
 			g_serverDrawDetailInformation.width = drawPolygon_msg->width;
@@ -1301,6 +1324,17 @@ DWORD WINAPI ReadThread(LPVOID arg)
 				MAKEWPARAM(drawPolygon_msg->startX, drawPolygon_msg->startY),
 				MAKELPARAM(drawPolygon_msg->endX, drawPolygon_msg->endY));
 			break;
+		
+		// 직선 그리기
+		case TYPE_DRAWSTRAIGHT:
+			drawPolygon_msg = (DRAWPOLYGON_MSG*)&comm_msg;
+			g_serverDrawDetailInformation.width = drawPolygon_msg->width;
+			g_serverDrawDetailInformation.color = drawPolygon_msg->color;
+			SendMessage(g_hDrawWnd, WM_DRAWSTRAIGHT,
+				MAKEWPARAM(drawPolygon_msg->startX, drawPolygon_msg->startY),
+				MAKELPARAM(drawPolygon_msg->endX, drawPolygon_msg->endY));
+			break;
+
 		case TYPE_ERASEPIC:
 			erasepic_msg = (ERASEPIC_MSG*)&comm_msg;
 			SendMessage(g_hDrawWnd, WM_ERASEPIC, 0, 0);
