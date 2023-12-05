@@ -288,6 +288,8 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				}
 
 				break;
+			case (TYPE_NOTICE): // TYPE_NOTICE인 경우 - 공지사항은 아무것도 하지않음
+				break;
 			case (TYPE_ID_RESULT):	// TYPE_ID 인 경우 (id 출력)
 				// ***  형변환 *** //
 				ID_RESULT_MSG* id_result_msg;
@@ -344,7 +346,12 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			// 데이터 받기
 			addrlen = sizeof(clientaddr);
 			retval = recvfrom(socket_UDP, buf, BUFSIZE, 0, (SOCKADDR*)&clientaddr, &addrlen);
-
+			// ==== 지안 ==== //
+			//공지사항이면, 무시
+			if (((COMM_MSG*)&buf)->type == TYPE_NOTICE) {
+				return;
+			}
+			// ============= //
 			printf("UDP groupNum : %d, type : %d\n", ((COMM_MSG*)&buf)->groupNum, ((COMM_MSG*)&buf)->type);
 
 

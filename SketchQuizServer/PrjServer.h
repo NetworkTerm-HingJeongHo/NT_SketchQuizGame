@@ -20,6 +20,7 @@
 
 #define TYPE_ID		2000				// 메시지 타입: id (지안)
 #define TYPE_ID_RESULT 2001				// 메시지 티입 : id 결과
+#define TYPE_NOTICE		2002			// 메시지 타입 : 공지사항
 // ============== //
 
 // ==== 정호 ====
@@ -93,6 +94,12 @@ typedef struct ID_RESULT
 	char msg[SIZE_DAT];	// id 내용
 } ID_RESULT_MSG;
 
+// 공지사항 저장 형식
+typedef struct NOTICE
+{
+	int  type;		// 공지사항 타입 (2002)
+	char msg[SIZE_DAT];	// 공지사항 내용
+} NOTICE_MSG;
 // ====================== //
 
 
