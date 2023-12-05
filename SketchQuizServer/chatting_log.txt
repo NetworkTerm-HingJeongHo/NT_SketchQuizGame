@@ -1,0 +1,13 @@
+{asdf} vvvvvvvvvvvvvv
+[asdf] 님이 입장하였습니다!
+{asdf} aaaaaaaaaaa
+{asdf} bbbbbbbbbbbbbb
+{asdf} vvvvvvvvvvvvv
+{asdf} cccccccccc
+[asdf] 님이 입장하였습니다!
+{asdf} sdffgdfdfsdg
+{asdf} sssssssssssss
+[sss] 님이 입장하였습니다!
+{sss} hello
+{sss} hi
+[sssaaaaaa] 님이 입장하였습니다!
