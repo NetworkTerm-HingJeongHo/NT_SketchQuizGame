@@ -66,7 +66,7 @@ DWORD WINAPI GameThread(LPVOID arg) {
 		Display(status, "%s", "tmp");
 
 		//SetDlgItemTextA(status, IDC_EDIT_WORD, (LPCSTR)quizWord[roundNum]);
-		SetDlgItemTextA(status, IDC_EDIT_WORD, "tmp");
+		SetDlgItemTextA(g_hDrawDlg, IDC_ANNOUNCE, "공지사항 내용");
 	}
 	return 0;
 }

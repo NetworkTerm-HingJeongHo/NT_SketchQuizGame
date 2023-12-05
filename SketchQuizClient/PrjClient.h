@@ -17,7 +17,6 @@
 
 #define TYPE_DRAWLINE 1001              // 메시지 타입: 선 그리기
 #define TYPE_ERASEPIC 1002              // 메시지 타입: 그림 지우기
-#define TYPE_Queue    1004              // 메시지 타입: 메시지 큐(연경)
 // ====== 지안 ========= //
 #define TYPE_ID			2000				// 메시지 타입: id (지안)
 #define TYPE_ID_RESULT	2001				// 메시지 티입 : id 결과

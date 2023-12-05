@@ -62,15 +62,15 @@ static int           g_gameScore;     // 게임 점수
 extern _TCHAR* messageQueue[10];      // 메시지 큐(도중에 들어온 클라이언트에게 이전 채팅 내용 표시
 static HWND          g_hDrawDlg;
 
-static BOOL          isMessageQueue;  // 메시지 큐인지
-static MESSAGEQUEUE  g_msgQueue;      // 메시지 큐 변수
 
 // 게임 관련 변수
-static int roundNum = 0;   //진행한 문제 개수. 제시어 배열의 인덱스 역할도 한다.
+static int roundNum = -1;   //진행한 문제 개수. 제시어 배열의 인덱스 역할도 한다.
 static int countdown = 30;
-static const _TCHAR* quizWord[4] = { _T("apple"), _T("바나나"), _T("포도"),_T("오렌지") };   // 제시어 배열
+static const _TCHAR* quizWord[4] = { _T("사과"), _T("바나나"), _T("포도"),_T("오렌지") };   // 제시어 배열
+static int maxRound = 4;
 static BOOL isGameOver = FALSE;
 static BOOL isOwner = FALSE;  // 문제를 내는 클라이언트일 경우 isOwner는 TRUE이다. 문제를 맞추는 사람인 경우 FALSE.
+static int score = 0;
 
 
 static char NICKNAME_CHAR[256];

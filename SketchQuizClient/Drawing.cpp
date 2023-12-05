@@ -75,7 +75,7 @@ void DisplayDrawingUserID(HWND hDlg, _TCHAR* userIDs) {
 	if (hStaticText != NULL) {
 		_TCHAR* drawingUserID = userIDs; // 랜덤 사용자 아이디를 가져옴
 		if (drawingUserID != NULL) {
-			SetWindowText(hStaticText, drawingUserID); // 텍스트 설정
+			SetWindowText(hStaticText, userIDs); // 텍스트 설정
 		}
 		else {
 			SetWindowText(hStaticText, _T("로그인먼저!"));
