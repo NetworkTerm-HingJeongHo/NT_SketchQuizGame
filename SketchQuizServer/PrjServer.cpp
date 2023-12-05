@@ -153,9 +153,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		case CLIENTOUT:
 			if (g_selectedIndex != -1) {
 				// 선택한 클라이언트를 제거하는 코드 추가
-				int portToRemove = g_selectedIndex;
-				RemoveClientFromListView(portToRemove);
-				RemoveSocketByPort(portToRemove);
+				RemoveClientFromListViewAndSock(g_selectedIndex);
 
 				// 선택을 해제하고 g_selectedIndex를 초기화
 				ListView_SetItemState(g_hListView, g_selectedIndex, 0, LVIS_SELECTED);
@@ -259,7 +257,7 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 						printf("[TCP] TYPE_ID, 현재 소켓 주소(char) : %s\n", inet_ntoa(ptr->sin_addr));
 						//MessageBox(NULL, ptr->id_nickname, _T("현재 소켓 닉네임 등록완료(_TCHAR)"), MB_ICONERROR);
 						// =========== 지윤 ============
-						AddClientToListView(ptr->sin_port, ptr->id_nickname);
+						AddClientToListView(ptr->sin_port, ptr->id_nickname, ptr->sock);
 						// =============================
 						// ---- 클라이언트로 전송 ------//
 						size_t dataSize = strlen("true"); // 중복이 아니므로, "true" 클라이언트로 전송
