@@ -1179,13 +1179,23 @@ DWORD WINAPI ClientMain(LPVOID arg)
 			serveraddr.sin_addr.s_addr = inet_addr(SERVERIP4_CHAR_UDP1);
 			serveraddr.sin_port = htons(SERVERPORT);
 
-
-			// 데이터 통신에 사용할 변수
+			// ===== 정호 ======
+			// 접속 데이터 전송
+			COMM_MSG group1Connect;
+			group1Connect.type = 0;
+			group1Connect.groupNum = TYPE_GROUP_A;
+			g_UDPGroupNum = TYPE_GROUP_A;
 			char buf[BUFSIZE + 1] = "hello, I'am UDP JIAN. UDP Channel1 !!";
-			int len;
+			memcpy(group1Connect.dummy, buf, sizeof(group1Connect.dummy));
+
+			// 기타 데이터들 그룹 초기화
+			g_drawellipsemsg.groupNum = TYPE_GROUP_A;
+			g_drawpolygonmsg.groupNum = TYPE_GROUP_A;
+			g_chatmsg.groupNum = TYPE_GROUP_A;
+			g_drawlinemsg.groupNum = TYPE_GROUP_A;
 
 			// 데이터 보내기
-			retval = sendto(g_sock, buf, BUFSIZE, 0,
+			retval = sendto(g_sock, (char*)&group1Connect, BUFSIZE, 0,
 				(SOCKADDR*)&serveraddr, sizeof(serveraddr));
 			if (retval == SOCKET_ERROR) {
 				err_display("sendto()");
@@ -1219,12 +1229,23 @@ DWORD WINAPI ClientMain(LPVOID arg)
 			serveraddr.sin_addr.s_addr = inet_addr(SERVERIP4_CHAR_UDP2);
 			serveraddr.sin_port = htons(SERVERPORT);
 
-			// 데이터 통신에 사용할 변수
+			// ===== 정호 ======
+			// 접속 데이터 전송
+			COMM_MSG group2Connect;
+			group2Connect.type = 0;
+			group2Connect.groupNum = TYPE_GROUP_B;
+			g_UDPGroupNum = TYPE_GROUP_B;
 			char buf[BUFSIZE + 1] = "hello, I'am UDP JIAN. UDP Channel2 !!";
-			int len;
+			memcpy(group2Connect.dummy, buf, sizeof(group2Connect.dummy));
+
+			// 기타 데이터들 그룹 초기화
+			g_drawellipsemsg.groupNum = TYPE_GROUP_B;
+			g_drawpolygonmsg.groupNum = TYPE_GROUP_B;
+			g_chatmsg.groupNum = TYPE_GROUP_B;
+			g_drawlinemsg.groupNum = TYPE_GROUP_B;
 
 			// 데이터 보내기
-			retval = sendto(g_sock, buf, strlen(buf), 0,
+			retval = sendto(g_sock, (char*)&group2Connect, BUFSIZE, 0,
 				(SOCKADDR*)&serveraddr, sizeof(serveraddr));
 			if (retval == SOCKET_ERROR) {
 				err_display("sendto()");

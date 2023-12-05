@@ -16,22 +16,24 @@ static _TCHAR*		drawingUserID;
 typedef struct _DRAWELLIPSE_MSG
 {
 	int  type;
+	int	 groupNum;
 	int	 width;
 	int  color;
 	int  x0, y0;
 	int  x1, y1;
-	char dummy[SIZE_TOT - 7 * sizeof(int)];
+	char dummy[SIZE_TOT - 8 * sizeof(int)];
 } DRAWELLIPSE_MSG;
 
 // 다각형
 typedef struct _DRAWPOLYGON_MSG
 {
 	int type;
+	int	groupNum;
 	int width;
 	int color;
 	int startX, startY;
 	int endX, endY;
-	char dummy[SIZE_TOT - 7 * sizeof(int)];
+	char dummy[SIZE_TOT - 8 * sizeof(int)];
 } DRAWPOLYGON_MSG;
 
 // 그림 세부 정보에 대한 구조체

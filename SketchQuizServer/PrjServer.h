@@ -14,7 +14,7 @@
 
 //==== 지안 ===== //
 #define SIZE_TOT 256                    // 전송 패킷(헤더 + 데이터) 전체 크기
-#define SIZE_DAT (SIZE_TOT-sizeof(int)) // 헤더를 제외한 데이터 부분만의 크기
+#define SIZE_DAT (SIZE_TOT-2*sizeof(int)) // 헤더를 제외한 데이터 부분만의 크기
 
 #define TYPE_ID		1003				// 메시지 타입: id (지안)
 // ============== //
@@ -59,6 +59,7 @@ typedef struct _MESSAGEQUEUE {
 typedef struct _CHAT_MSG
 {
 	int  type;
+	int	 groupNum;
 	char msg[SIZE_DAT];
 } CHAT_MSG;
 
@@ -70,6 +71,7 @@ typedef struct _CHAT_MSG
 typedef struct _COMM_MSG
 {
 	int  type;
+	int	 groupNum;
 	char dummy[SIZE_DAT];
 } COMM_MSG;
 
@@ -90,10 +92,14 @@ INT_PTR CALLBACK DialogProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 // 소켓 정보 관리 함수
 bool AddSocketInfoTCP(SOCKET sock);
-bool AddSocketInfoUDP(SOCKADDR_IN addr);
+bool AddSocketInfoUDP(SOCKADDR_IN addr, int groupNum);
 void RemoveSocketInfo(SOCKET sock);
 void addMessage(char* message);
 SOCKETINFO* GetSocketInfo(SOCKET sock);
+
+// 해당 클라이언트의 그룹 정보 가져오기
+int GetGroupNumber(SOCKADDR_IN addr);
+
 
 // 윈도우 메시지 처리 함수
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);

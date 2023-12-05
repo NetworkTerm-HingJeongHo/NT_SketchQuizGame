@@ -5,7 +5,7 @@
 int nTotalSockets = 0;
 int nTotalUDPSockets = 0;
 SOCKETINFO* SocketInfoArray[FD_SETSIZE]; //TCP 유저들 있는 변수
-SOCKADDR_IN UDPSocketInfoArray[FD_SETSIZE]; //UDP 유저들 있는 변수
+UDPINFO* UDPSocketInfoArray[FD_SETSIZE]; //UDP 유저들 있는 변수
 
 SOCKET listen_sock4;
 SOCKADDR_IN serveraddr;
@@ -210,6 +210,9 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	int addrlen, retval;
 	char buf[BUFSIZE + 1];
 
+	// === 정호 ===
+	int groupNumUDP = 0;
+
 	// 오류 발생 여부 확인
 	if (WSAGETSELECTERROR(lParam)) {
 		err_display(WSAGETSELECTERROR(lParam));
@@ -343,6 +346,19 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			// 데이터 받기
 			addrlen = sizeof(clientaddr);
 			retval = recvfrom(socket_UDP, buf, BUFSIZE, 0, (SOCKADDR*)&clientaddr, &addrlen);
+
+			printf("UDP groupNum : %d, type : %d\n", ((COMM_MSG*)&buf)->groupNum, ((COMM_MSG*)&buf)->type);
+			
+			
+			groupNumUDP = GetGroupNumber(clientaddr);
+			printf("Get Group Num : %d\n", groupNumUDP);
+
+			if (groupNumUDP == -1)
+			{
+				// UDP로 접속한 클라 정보 수집
+				AddSocketInfoUDP(clientaddr, ((COMM_MSG*)&buf)->groupNum);
+			}
+
 			printf("[UDP] 데이터 길이 : %d, 데이터 : %s\n", retval, ((COMM_MSG*)&buf)->dummy);
 			char msg[256];
 			strcpy(msg,((COMM_MSG*)&buf)->dummy);
@@ -362,9 +378,6 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			}
 
 			// ====================
-
-			// UDP로 접속한 클라 정보 수집
-			AddSocketInfoUDP(clientaddr);
 		}
 	case FD_WRITE:
 		// UDP 소켓이 아닌 경우 (TCP인 경우)
@@ -396,12 +409,18 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			for (int i = 0; i < nTotalUDPSockets; i++)
 			{
-				SOCKADDR_IN clientUDP = UDPSocketInfoArray[i];
-				// 데이터 보내기
-				retval = sendto(socket_UDP, buf, BUFSIZE, 0, (SOCKADDR*)&clientUDP, sizeof(clientUDP));
-				if (retval == SOCKET_ERROR) {
-					err_display("sendto()");
-					return;
+				// 같은 그룹에만 데이터 전송
+				UDPINFO* clientUDP = UDPSocketInfoArray[i];
+				printf("send groupNumUDP : %d, clientUDP->GroupNum : %d\n", groupNumUDP, clientUDP->groupNum);
+				if (groupNumUDP == clientUDP->groupNum)
+				{
+					// 데이터 보내기
+					retval = sendto(socket_UDP, buf, BUFSIZE, 0, (SOCKADDR*)&clientUDP->addr, sizeof(clientUDP->addr));
+					if (retval == SOCKET_ERROR) {
+						err_display("sendto()");
+						return;
+					}
+					printf("sendto retval : %d\n", retval);
 				}
 			}
 		}
@@ -430,21 +449,36 @@ SOCKETINFO* GetSocketInfo(SOCKET sock)
 }
 
 // UDP 클라 정보 추가
-bool AddSocketInfoUDP(SOCKADDR_IN addr)
+bool AddSocketInfoUDP(SOCKADDR_IN addr, int groupNum)
 {
 	// 이전에 접속한 적이 있는 상태인지 확인
 	for (int i = 0; i < nTotalUDPSockets; i++)
 	{
-		if (inet_ntoa(UDPSocketInfoArray[i].sin_addr) == inet_ntoa(addr.sin_addr) &&
-			ntohs(UDPSocketInfoArray[i].sin_port) == ntohs(addr.sin_port) &&
-			ntohs(UDPSocketInfoArray[i].sin_family) == ntohs(addr.sin_family))
+		if (inet_ntoa(UDPSocketInfoArray[i]->addr.sin_addr) == inet_ntoa(addr.sin_addr) &&
+			ntohs(UDPSocketInfoArray[i]->addr.sin_port) == ntohs(addr.sin_port) &&
+			ntohs(UDPSocketInfoArray[i]->addr.sin_family) == ntohs(addr.sin_family))
 		{
+			// 그룹을 변경한 경우
+			if ((groupNum != UDPSocketInfoArray[i]->groupNum) && (groupNum == TYPE_GROUP_A || groupNum == TYPE_GROUP_B))
+			{
+				UDPSocketInfoArray[i]->groupNum = groupNum;
+			}
 			return false;
 		}
 	}
 
+	UDPINFO* newUDPClient = (UDPINFO*)malloc(sizeof(UDPINFO));
+	if (newUDPClient == NULL)
+	{
+		return false;
+	}
+	newUDPClient->addr = addr;
+	newUDPClient->groupNum = groupNum;
+
 	// UDP 클라 정보 추가
-	UDPSocketInfoArray[nTotalUDPSockets++] = addr;
+	UDPSocketInfoArray[nTotalUDPSockets++] = newUDPClient;
+
+	printf("Add UDP Client Info groupNum : %d\n", newUDPClient->groupNum);
 	return true;
 }
 
@@ -511,6 +545,22 @@ void RemoveSocketInfo(SOCKET sock)
 
 	// 소켓 닫기
 	closesocket(sock);
+}
+
+// 해당 클라이언트의 그룹 정보 가져오기
+int GetGroupNumber(SOCKADDR_IN addr)
+{
+	// 이전에 접속한 적이 있는 상태인지 확인
+	for (int i = 0; i < nTotalUDPSockets; i++)
+	{
+		if (inet_ntoa(UDPSocketInfoArray[i]->addr.sin_addr) == inet_ntoa(addr.sin_addr) &&
+			ntohs(UDPSocketInfoArray[i]->addr.sin_port) == ntohs(addr.sin_port) &&
+			ntohs(UDPSocketInfoArray[i]->addr.sin_family) == ntohs(addr.sin_family))
+		{
+			return UDPSocketInfoArray[i]->groupNum;
+		}
+	}
+	return -1;
 }
 
 
