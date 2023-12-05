@@ -9,9 +9,9 @@
 #define CLIENTOUT 3001
 
 // ==== 연경 ====
-#define TYPE_CHAT   1000
-#define TYPE_ENTER    1005              // 메시지 타입: 입장했을 경우->서버가 이를 알고 이전채팅내용전송
-#define TYPE_NOTY     1006  // 입장, 퇴장, 새 라운드 알림 메시
+#define TYPE_CHAT   5000
+#define TYPE_ENTER    5001              // 메시지 타입: 입장했을 경우->서버가 이를 알고 이전채팅내용전송
+#define TYPE_NOTY     5002  // 입장, 퇴장, 새 라운드 알림 메시
 // =============
 
 //==== 지안 ===== //
