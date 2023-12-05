@@ -8,8 +8,10 @@ void MySendFile(char* senderName, char* reciverName, char* msg) {
 	//tmp = strcat((char*)"_TO_", reciverName);
 	//fileName = strcat(fileName, tmp);
 	//fileName = strcat(fileName, (char*)"txt");
+	char fileName[256];
+	snprintf(fileName, sizeof(fileName), "From_%s_to_%s.txt", senderName, reciverName);
 
-	if ((fp = fopen("test.txt", "a")) == NULL) {
+	if ((fp = fopen(fileName, "a")) == NULL) {
 		printf("파일 읽기 오류! \n");
 	}
 

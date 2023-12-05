@@ -395,7 +395,7 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				// ================= 지윤 =================
 				ClearChatListView();
 				// ========================================
-				
+
 				UDPINFO* clientUDP = UDPSocketInfoArray[nTotalSockets - 1];  //가장 최근 접속한 소켓
 				COMM_MSG sendMsg;
 				sendMsg.type = TYPE_CHAT;
@@ -430,6 +430,17 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				}
 				printf("=========================\n");
 				fclose(sendFd);
+
+				FILE* fd;
+				if (comm_msg->groupNum == TYPE_GROUP_A)
+					fd = fopen("chatting_log_1.txt", "a+");
+				else
+					fd = fopen("chatting_log_2.txt", "a+");
+
+				char n = '\n';
+				fwrite(msg, sizeof(char), strlen(msg), fd);
+				fwrite(&n, sizeof(char), sizeof(n), fd);
+				fclose(fd);
 				break;
 			}
 			case TYPE_START: {
@@ -472,16 +483,16 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			case TYPE_CHAT: {
 				FILE* fd;
 				if (comm_msg->groupNum == TYPE_GROUP_A)
-					fd = fopen("chatting_log_1.txt", "a");
+					fd = fopen("chatting_log_1.txt", "a+");
 				else
-					fd = fopen("chatting_log_2.txt", "a");
+					fd = fopen("chatting_log_2.txt", "a+");
 				char n = '\n';
 				fwrite(msg, sizeof(char), strlen(msg), fd);
 				fwrite(&n, sizeof(char), sizeof(n), fd);
+				fclose(fd);
 				// ================= 지윤 =================
 				AddChatMessageToListView(msg);
 				// ========================================
-				fclose(fd);
 				break;
 			}
 
