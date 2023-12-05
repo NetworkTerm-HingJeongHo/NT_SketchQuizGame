@@ -145,6 +145,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="chatting.cpp" />
+    <ClCompile Include="DisplayChatData.cpp" />
     <ClCompile Include="DisplayClientList.cpp" />
     <ClCompile Include="Login.cpp" />
     <ClCompile Include="PrjServer.cpp">
@@ -155,6 +156,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="chatting.h" />
+    <ClInclude Include="DisplayChatData.h" />
     <ClInclude Include="DisplayClientList.h" />
     <ClInclude Include="Login.h" />
     <ClInclude Include="PrjServer.h" />
