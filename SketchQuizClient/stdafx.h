@@ -152,6 +152,9 @@ static HWND			hwndHome_Notice;	// 공지사항 입력 윈도우
 #define TYPE_DRAWPARALLELOGRAM		4008		// 메시지 타입 : 평행사변형 그리기
 #define TYPE_DRAWDIAMOND			4009		// 메시지 타입 : 마름모 그리기
 #define TYPE_DRAWARROW				4010		// 메시지 타입 : 화살표 그리기
+#define TYPE_DRAWSPARKLE			4011		// 메시지 타입 : 반짝 그리기
+#define TYPE_DRAWHEART				4012		// 메시지 타입 : 하트 그리기
+#define TYPE_DRAWFANSHAPE			4013		// 메시지 타입 : 부채꼴 그리기
 
 #define WM_DRAWELLIPSE			(WM_USER+3)		// 타원 그리기 윈도우 메시지
 #define WM_ERASEALITTLE			(WM_USER+4)		// 특정 부분 조금 지우기 윈도우 메시지
@@ -165,6 +168,9 @@ static HWND			hwndHome_Notice;	// 공지사항 입력 윈도우
 #define WM_DRAWPARALLELOGRAM	(WM_USER+12)	// 평행사변형 그리기 윈도우 메시지
 #define WM_DRAWDIAMOND			(WM_USER+13)	// 마름모 그리기 윈도우 메시지
 #define WM_DRAWARROW			(WM_USER+14)	// 화살표 그리기 윈도우 메시지
+#define WM_DRAWSPARKLE			(WM_USER+15)	// 반짝 그리기 윈도우 메시지
+#define WM_DRAWHEART			(WM_USER+16)	// 하트 그리기 윈도우 메시지
+#define WM_DRAWFANSHAPE			(WM_USER+17)	// 부채꼴 그리기 윈도우 메시지
 
 // 그리기 모드 종류
 #define MODE_ERASE			4500
@@ -180,6 +186,9 @@ static HWND			hwndHome_Notice;	// 공지사항 입력 윈도우
 #define MODE_PARALLELOGRAM	4510
 #define MODE_DIAMOND		4511
 #define MODE_ARROW			4512
+#define MODE_SPARKLE		4513	
+#define MODE_HEART			4514
+#define MODE_FANSHAPE		4515	
 
 // UDP 그룹 번호
 #define TYPE_GROUP_A		1000000
