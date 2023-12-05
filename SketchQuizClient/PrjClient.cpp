@@ -1388,6 +1388,9 @@ DWORD WINAPI ReadThread(LPVOID arg)
 
 			break;
 		case TYPE_ENTER:
+			chat_msg = (CHAT_MSG*)&comm_msg;
+			DisplayText("%s\r\n", chat_msg->msg);
+			break;
 		case TYPE_NOTY:
 			chat_msg = (CHAT_MSG*)&comm_msg;
 			DisplayText("%s\r\n", chat_msg->msg);

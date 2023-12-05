@@ -375,22 +375,34 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				while (fgets(sendMsg.dummy, BUFSIZE, sendFd)) {
 					printf("%s\n", sendMsg.dummy);
 					// 데이터 보내기
-					retval = sendto(socket_UDP, (char*)&sendMsg, BUFSIZE, 0, (SOCKADDR*)&clientUDP, sizeof(clientUDP));
-					if (retval == SOCKET_ERROR) {
-						err_display("sendto()");
-						return;
+					if (groupNumUDP == clientUDP->groupNum)
+					{
+						// 데이터 보내기
+						retval = sendto(socket_UDP, (char*)&sendMsg, BUFSIZE, 0, (SOCKADDR*)&clientUDP->addr, sizeof(clientUDP->addr));
+						//if (retval == SOCKET_ERROR) {
+						//	err_display("sendto()");
+						//	return;
+						//}
+						//printf("sendto retval : %d\n", retval);
 					}
+					
+					//if (retval == SOCKET_ERROR) {
+					//	err_display("sendto()");
+					//	return;
+					//}
 				}
 				printf("=========================\n");
 				fclose(sendFd);
 			}
 
 			case TYPE_CHAT:
-				printf("채팅입니다\n");
-				FILE* fd = fopen("chatting_log.txt", "w");
+				FILE* fd = fopen("chatting_log.txt", "a");
+				char n = '\n';
 				fwrite(msg, sizeof(char), strlen(msg), fd);
+				fwrite(&n, sizeof(char), sizeof(n), fd);
 				fclose(fd);
 				break;
+
 			}
 
 			// ====================
