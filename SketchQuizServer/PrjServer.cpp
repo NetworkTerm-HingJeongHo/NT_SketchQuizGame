@@ -294,6 +294,11 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 							//break;
 						}
 						// ----------------------------//
+
+						// ---------소켓 지우기 -------//
+						
+						// RemoveSocketInfo(ptr->sock);
+						// ----------------------------//
 					}
 
 					break;

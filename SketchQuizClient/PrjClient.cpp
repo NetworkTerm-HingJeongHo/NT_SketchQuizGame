@@ -825,6 +825,7 @@ LRESULT CALLBACK LoginWndProc(HWND hwndLogin, UINT msg, WPARAM wParam, LPARAM lP
 			// ---------------------------- //
 			 
 			Sleep(1000);
+			MessageBox(hwndLogin, recvBuf_tchar, _T("서버 중복 확인 결과"), MB_OK);
 		// 현재 있는 Id와, 입력한 아이디 와의 비교
 			if (_tcscmp(recvBuf_tchar, _T("false")) == 0)
 			{
@@ -1105,7 +1106,7 @@ DWORD WINAPI LoginProcessClient(LPVOID arg)
 		//printf("[TCP 클라이언트] %d바이트를 받았습니다.\n", retval);
 		//printf("[받은 데이터] %s\n", recvBuf);
 		MultiByteToWideChar(CP_ACP, 0, recvBuf, -1, recvBuf_tchar, BUFSIZE); // char* 형 문자열을 _TCHAR 형 문자열로 변환
-		MessageBox(NULL, recvBuf_tchar, _T("TCP 데이터를 받았어요"), MB_ICONERROR);
+		//MessageBox(NULL, recvBuf_tchar, _T("TCP 데이터를 받았어요"), MB_ICONERROR);
 
 	}
 	
