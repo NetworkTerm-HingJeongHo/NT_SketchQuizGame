@@ -246,12 +246,12 @@ INT_PTR CALLBACK DlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			pt.x, pt.y, rect.right - rect.left, rect.bottom - rect.top,
 			hDlg, (HMENU)NULL, g_hInstance, NULL);
 		if (g_hDrawWnd == NULL) exit(1);
-		ShowWindow(g_hDrawWnd, SW_SHOW);
-		UpdateWindow(g_hDrawWnd);
 		return TRUE;
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDC_GAMESTART:
+			ShowWindow(g_hDrawWnd, SW_SHOW);
+			UpdateWindow(g_hDrawWnd);
 			// 컨트롤 상태 변경
 			EnableWindow(g_hBtnSendFile, TRUE);
 			EnableWindow(g_hBtnSendMsg, TRUE);
