@@ -156,9 +156,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	switch (uMsg) {
 		// =========== 지윤 ============
 	case WM_CREATE:
+		/* 클라이언트 목록 */
 		InitializeListView(hWnd);
 		CreateWindow(_T("BUTTON"), _T("사용자 강제퇴장"), WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
 			10, 220, 200, 30, hWnd, (HMENU)CLIENTOUT, NULL, NULL);
+
+		/* 채팅 데이터 */
+		InitializeChatListView(hWnd);
 		return 0;
 	case WM_COMMAND:
 		switch (LOWORD(wParam))

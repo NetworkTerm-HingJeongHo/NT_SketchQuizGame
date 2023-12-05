@@ -14,4 +14,5 @@
 // 
 // ==== ÁöÀ± ====//
 #include "DisplayClientList.h"
+#include "DisplayChatData.h"
 // ============ //
