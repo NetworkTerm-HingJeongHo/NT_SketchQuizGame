@@ -49,6 +49,7 @@ void DisplayClientList() {
     UpdateWindow(g_hListView);
 }
 
+// 포트 번호에 해당하는 클라이언트를 목록에서 제거
 void RemoveClientFromListView(int port) {
     LVFINDINFO lvFindInfo;
     lvFindInfo.flags = LVFI_STRING;
@@ -63,4 +64,33 @@ void RemoveClientFromListView(int port) {
         ListView_DeleteItem(g_hListView, index);
     }
     DisplayClientList();
+}
+
+// 포트 번호에 해당하는 소켓을 찾아서 제거하는 함수
+void RemoveSocketByPort(int portToRemove)
+{
+    SOCKET socketToRemove = INVALID_SOCKET;
+
+    // 소켓 배열을 반복하여 포트 번호에 해당하는 소켓을 찾음
+    for (int i = 0; i < nTotalSockets; i++)
+    {
+        SOCKETINFO* ptr = SocketInfoArray[i];
+        // 해당 소켓의 포트 번호를 가져와서 비교
+        struct sockaddr_in clientaddr;
+        int addrlen = sizeof(clientaddr);
+        getpeername(ptr->sock, (struct sockaddr*)&clientaddr, &addrlen);
+        int port = ntohs(clientaddr.sin_port);
+
+        if (port == portToRemove)
+        {
+            socketToRemove = ptr->sock;
+            break;
+        }
+    }
+
+    if (socketToRemove != INVALID_SOCKET)
+    {
+        // 찾은 소켓을 제거
+        RemoveSocketInfo(socketToRemove);
+    }
 }

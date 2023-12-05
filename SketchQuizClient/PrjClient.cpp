@@ -765,9 +765,11 @@ LRESULT CALLBACK ChildWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 // 로그인 윈도우 프로시저 (로그인 영역) -----------------------------------------------------------------------------------//
 LRESULT CALLBACK LoginWndProc(HWND hwndLogin, UINT msg, WPARAM wParam, LPARAM lParam) {
 	g_isDup == 0; //중복확인 비활성화
+	int retval;
 	switch (msg) {
 
 	case WM_CREATE:
+		LoginProcessClientThread = CreateThread(NULL, 0, LoginProcessClient, NULL, 0, NULL);
 		// 로그인 화면 초기화 및 컨트롤 생성
 																								   //x,y,width,height
 		CreateWindow(_T("STATIC"), _T("스케치퀴즈"), WS_VISIBLE | WS_CHILD | SS_CENTER | SS_CENTERIMAGE, 500, 100, 300, 100, hwndLogin, NULL, NULL, NULL); // 스케치퀴즈 타이틀
@@ -790,6 +792,22 @@ LRESULT CALLBACK LoginWndProc(HWND hwndLogin, UINT msg, WPARAM wParam, LPARAM lP
 		case ID_LOGIN_BUTTON: // 로그인 버튼을 클릭했을 시
 			
 			_tcscpy(ID_NICKNAME, input_result); // 현재 입력한 ID 저장
+
+			// ---------- 서버로 최종 id 전송 --------------- //
+			// id_msg 구조체 초기화
+			ID_RESULT_MSG id_result_msg;
+			id_result_msg.type = TYPE_ID_RESULT;	//id타입
+			strcpy(id_result_msg.msg, NICKNAME_CHAR);	//NICKNAME_CHAR일 경우
+			
+			retval = sendn(g_sock, (char*)&id_result_msg, BUFSIZE, 0, serveraddr, false); // 최종 id 보내기
+
+			//printf("[TCP 클라이언트] %d바이트를 보냈습니다.\n", retval);
+			if (retval == SOCKET_ERROR) {
+				err_display("send()");
+				//break;
+			}
+
+			// --------------------------------------------- //
 			MessageBox(hwndLogin, ID_NICKNAME, _T("메인 화면으로 이동합니다."), MB_OK);
 
 			// ==================== 지윤 ====================
@@ -809,13 +827,27 @@ LRESULT CALLBACK LoginWndProc(HWND hwndLogin, UINT msg, WPARAM wParam, LPARAM lP
 			GetDlgItemText(hwndLogin, ID_ID_INPUT, input_result, sizeof(input_result));
 
 
-			// ---- 로그인 할때 TCP 연결 ---- //
+			// ---- TPC 연결한거에 고정 크기 데이터 전송 ---- //
 			_tcscpy(ID_NICKNAME, input_result); // 현재 입력한 ID 저장
 			WideCharToMultiByte(CP_ACP, 0, ID_NICKNAME, 256, NICKNAME_CHAR, 256, NULL, NULL); //_TCHAR 형 문자열을 char* 형 문자열로 변경
-			// 스레드 생성!
+
+			// id_msg 구조체 초기화
+			ID_MSG id_msg;
+			id_msg.type = TYPE_ID;	//id타입
+			strcpy(id_msg.msg, NICKNAME_CHAR);	//NICKNAME_CHAR일 경우
+
+			
+			retval = sendn(g_sock, (char*)&id_msg, BUFSIZE, 0, serveraddr, false);
+
+			//printf("[TCP 클라이언트] %d바이트를 보냈습니다.\n", retval);
+			if (retval == SOCKET_ERROR) {
+				err_display("send()");
+				//break;
+			}
+			// 스레드 !생성
 			//LoginProcessClient(); //TCP 연결. ->
 			// 스레드 생성
-			LoginProcessClientThread = CreateThread(NULL, 0, LoginProcessClient, NULL, 0, NULL);
+			//LoginProcessClientThread = CreateThread(NULL, 0, LoginProcessClient, NULL, 0, NULL);
 
 			//// 스레드 종료 대기
 			//WaitForSingleObject(LoginProcessClientThread, INFINITE);
@@ -1054,11 +1086,11 @@ LRESULT CALLBACK Home_PassWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPa
 // 클라이언트와 데이터 통신
 DWORD WINAPI LoginProcessClient(LPVOID arg)
 {
-	// ====== 지안 ========= //
-	// id_msg 구조체 초기화
-	ID_MSG id_msg;
-	id_msg.type = TYPE_ID;	//id타입
-	strcpy(id_msg.msg, NICKNAME_CHAR);	//NICKNAME_CHAR일 경우
+	//// ====== 지안 ========= //
+	//// id_msg 구조체 초기화
+	//ID_MSG id_msg;
+	//id_msg.type = TYPE_ID;	//id타입
+	//strcpy(id_msg.msg, NICKNAME_CHAR);	//NICKNAME_CHAR일 경우
 
 	// ===================== //
 	int retval;
@@ -1079,14 +1111,14 @@ DWORD WINAPI LoginProcessClient(LPVOID arg)
 	int len;
 	len = sizeof(NICKNAME_CHAR);
 
-	// 고정 크기 데이터 전송 (TCP 첫 실행시 한번)
-	retval = sendn(g_sock, (char*)&id_msg, BUFSIZE, 0, serveraddr, false);
+	//// 고정 크기 데이터 전송 (TCP 첫 실행시 한번)
+	//retval = sendn(g_sock, (char*)&id_msg, BUFSIZE, 0, serveraddr, false);
 
-	printf("[TCP 클라이언트] %d바이트를 보냈습니다.\n", retval);
-	if (retval == SOCKET_ERROR) {
-		err_display("send()");
-		//break;
-	}
+	//printf("[TCP 클라이언트] %d바이트를 보냈습니다.\n", retval);
+	//if (retval == SOCKET_ERROR) {
+	//	err_display("send()");
+	//	//break;
+	//}
 
 	
 	//char recvBuf[BUFSIZE]; // 데이터 받을 버퍼

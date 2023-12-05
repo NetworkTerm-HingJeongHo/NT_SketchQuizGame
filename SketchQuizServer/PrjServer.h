@@ -17,6 +17,7 @@
 #define SIZE_DAT (SIZE_TOT-2*sizeof(int)) // 헤더를 제외한 데이터 부분만의 크기
 
 #define TYPE_ID		1003				// 메시지 타입: id (지안)
+#define TYPE_ID_RESULT 1005				// 메시지 티입 : id 결과
 // ============== //
 
 // ==== 정호 ====
@@ -82,6 +83,14 @@ typedef struct ID
 	int  type;		// 로그인할때 ID 형식
 	char msg[SIZE_DAT];	// id 내용
 } ID_MSG;
+
+// 로그인 버튼 누르고 최종 저장할때 ID 결과 저장 형식
+typedef struct ID_RESULT
+{
+	int  type;		// '로그인' 버튼 눌렀을때 ID 형식
+	char msg[SIZE_DAT];	// id 내용
+} ID_RESULT_MSG;
+
 // ====================== //
 
 
@@ -104,3 +113,19 @@ int GetGroupNumber(SOCKADDR_IN addr);
 // 윈도우 메시지 처리 함수
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+// // =========== 정호 =============
+// 클라이언트 관리 배열
+static int nTotalSockets = 0;
+static int nTotalUDPSockets = 0;
+static SOCKETINFO* SocketInfoArray[FD_SETSIZE]; //TCP 유저들 있는 변수
+static UDPINFO* UDPSocketInfoArray[FD_SETSIZE]; //UDP 유저들 있는 변수
+
+static SOCKET listen_sock4;
+static SOCKADDR_IN serveraddr;
+static SOCKET socket_UDP;
+
+// ============= 연경 =============== 
+//char* g_msgQueue[BUFSIZE];    // 메시지 원형 큐: 이전 대화내용 표시. 꽉 차면 가장 오래된 메시지부터 지워진다.
+//int head = 0, tail = 0;           // 원형 큐 인덱스
+static MESSAGEQUEUE g_msgQueue;
