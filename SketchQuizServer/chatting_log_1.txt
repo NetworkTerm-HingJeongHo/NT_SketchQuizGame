@@ -1,6 +1,6 @@
-== 채널 1 채팅복원
+== ä�� 1 ä�ú���
 
-[asdf] 님이 입장하였습니다!
+[asdf] ���� �����Ͽ����ϴ�!
 {asdf} aaaaaaa
 {asdf} gggggggggggg
 {asdf} asdfsadfsadfsadf
