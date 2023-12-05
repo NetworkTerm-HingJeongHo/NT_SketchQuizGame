@@ -300,7 +300,7 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				printf("[TCP] TYPE_RESULT_ID, 현재 소켓 주소(char) : %s\n", inet_ntoa(ptr->sin_addr));
 				//MessageBox(NULL, ptr->id_nickname, _T("현재 소켓 닉네임 등록완료(_TCHAR)"), MB_ICONERROR);
 				// =========== 지윤 ============
-				AddClientToListView(ptr->sin_port, ptr->id_nickname);
+				AddClientToListView(ptr->sin_port, ptr->id_nickname, ptr->sock);
 				// =============================
 
 				// -------------------------------------------------------- //
