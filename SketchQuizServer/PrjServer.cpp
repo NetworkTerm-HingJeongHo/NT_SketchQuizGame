@@ -244,9 +244,10 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		if (wParam != socket_UDP)
 		{
 			ptr = GetSocketInfo(wParam);
-			if (ptr->recvbytes > 0) {
-				return;
-			}
+			//if (ptr->recvbytes > 0) {
+			//	printf("no");
+			//	return;
+			//}
 			// 고정 데이터 받기
 			retval = recv(ptr->sock, ptr->buf, BUFSIZE, 0);
 			// ============================== 지안 ================================//
@@ -258,21 +259,16 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			// Type에 따라 다른 구조체를 가진 switch (직접 형변환 해줘야 함)
 			switch (comm_msg->type) {
 				case (TYPE_ID) :	// TYPE_ID 인 경우 (id 출력)
+					// ***  형변환 *** //
 					ID_MSG* id_msg;
 					id_msg = (ID_MSG*)&(ptr->buf); // ID로 형변환
 					printf("[TYPE_ID 받은 데이터] %s\n", id_msg->msg);
-					
+					// *** 형변환 끝 *** //
+
 					// 만약 현재 받은 닉네임이 중복되지 않았다면 (ture)
 					if (CheckIDDuplication(nTotalSockets, SocketInfoArray, id_msg->msg)) {
 						printf("[TCP] 중복된 아이디 없음");
 						setIDInSocket(id_msg->msg, ptr); //id 등록
-						printf("[TCP] TYPE_ID, 현재 소켓 닉네임 등록완료 : %s\n", ptr->id_nickname_char);
-						printf("[TCP] TYPE_ID, 현재 소켓 port 등록완료 : %d\n", ptr->sin_port);
-						printf("[TCP] TYPE_ID, 현재 소켓 주소(char) : %s\n", inet_ntoa(ptr->sin_addr));
-						//MessageBox(NULL, ptr->id_nickname, _T("현재 소켓 닉네임 등록완료(_TCHAR)"), MB_ICONERROR);
-						// =========== 지윤 ============
-						AddClientToListView(ptr->sin_port, ptr->id_nickname);
-						// =============================
 						// ---- 클라이언트로 전송 ------//
 						size_t dataSize = strlen("true"); // 중복이 아니므로, "true" 클라이언트로 전송
 						retval = send(ptr->sock, "true", dataSize, 0);
@@ -301,6 +297,24 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 						// ----------------------------//
 					}
 
+					break;
+				case (TYPE_ID_RESULT):	// TYPE_ID 인 경우 (id 출력)
+					// ***  형변환 *** //
+					ID_RESULT_MSG* id_result_msg;
+					id_result_msg = (ID_RESULT_MSG*)&(ptr->buf); // ID로 형변환
+					printf("[TYPE_RESULT_ID 받은 데이터] %s\n", id_result_msg->msg);
+					// *** 형변환 끝 *** //
+
+					// --------- 소켓 닉네임(ID) 저장하고, gui에 올리기 --------- //
+					printf("[TCP] TYPE_RESULT_ID, 현재 소켓 닉네임 등록완료 : %s\n", ptr->id_nickname_char);
+					printf("[TCP] TYPE_RESULT_ID, 현재 소켓 port 등록완료 : %d\n", ptr->sin_port);
+					printf("[TCP] TYPE_RESULT_ID, 현재 소켓 주소(char) : %s\n", inet_ntoa(ptr->sin_addr));
+					//MessageBox(NULL, ptr->id_nickname, _T("현재 소켓 닉네임 등록완료(_TCHAR)"), MB_ICONERROR);
+					// =========== 지윤 ============
+					AddClientToListView(ptr->sin_port, ptr->id_nickname);
+					// =============================
+
+					// -------------------------------------------------------- //
 					break;
 					// ======== 연경 =======
 				case TYPE_CHAT:

@@ -17,6 +17,7 @@
 #define SIZE_DAT (SIZE_TOT-sizeof(int)) // 헤더를 제외한 데이터 부분만의 크기
 
 #define TYPE_ID		1003				// 메시지 타입: id (지안)
+#define TYPE_ID_RESULT 1005				// 메시지 티입 : id 결과
 // ============== //
 
 // ==== 정호 ====
@@ -69,6 +70,14 @@ typedef struct ID
 	int  type;		// 로그인할때 ID 형식
 	char msg[SIZE_DAT];	// id 내용
 } ID_MSG;
+
+// 로그인 버튼 누르고 최종 저장할때 ID 결과 저장 형식
+typedef struct ID_RESULT
+{
+	int  type;		// '로그인' 버튼 눌렀을때 ID 형식
+	char msg[SIZE_DAT];	// id 내용
+} ID_RESULT_MSG;
+
 // ====================== //
 
 
