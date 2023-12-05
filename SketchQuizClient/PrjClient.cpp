@@ -734,7 +734,7 @@ LRESULT CALLBACK LoginWndProc(HWND hwndLogin, UINT msg, WPARAM wParam, LPARAM lP
 			}
 
 			// --------------------------------------------- //
-			//MessageBox(hwndLogin, ID_NICKNAME, _T("메인 화면으로 이동합니다."), MB_OK);
+			MessageBox(hwndLogin, ID_NICKNAME, _T("메인 화면으로 이동합니다."), MB_OK);
 
 			// ==================== 지윤 ====================
 			AddUser(userIDs, input_result);
