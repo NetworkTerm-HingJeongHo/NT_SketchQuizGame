@@ -113,3 +113,18 @@ void DrawDiamondInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam);
 
 // 화살표를 특정 HDC에 그림
 void DrawArrowInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam);
+
+// 반짝을 특정 HDC에 그림
+void DrawSparkleInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam);
+
+// 하트를 특정 HDC에 그림
+void DrawHeartInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam);
+
+// 부채꼴을 특정 HDC에 그림
+void DrawFanshapeInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam);
+
+// 도형 전송 데이터 형식 만들기
+void ShapeDataInput(DRAWPOLYGON_MSG& drawpolygon_msg, int type, int startX, int startY, LPARAM lParam, DRAW_DETAIL_INFORMATION DDinfo);
+
+// 도형 데이터 메시지 전송
+void SendMessageShapeData(HWND hDrawWnd, DRAWPOLYGON_MSG* DP_Msg, DRAW_DETAIL_INFORMATION &DDinfo, int WM_Drawtype);
