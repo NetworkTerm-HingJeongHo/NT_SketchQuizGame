@@ -198,7 +198,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 
-	FILE* fd;
+	//FILE* fd;
 	// 데이터 통신에 사용할 변수
 	SOCKETINFO* ptr;
 	SOCKET client_sock;
@@ -302,13 +302,14 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					}
 
 					break;
-					// ======== 연경 =======
-				case TYPE_CHAT:
-					fd = fopen("chatting_log.txt", "a");
-					CHAT_MSG* chat_msg;
-					chat_msg = (CHAT_MSG*)comm_msg;
-					fwrite(chat_msg->msg, sizeof(char*), sizeof(chat_msg->msg), fd);
-					fclose(fd);
+				// ======== 연경 =======
+				//case TYPE_CHAT:
+				//	fd = fopen("chatting_log.txt", "a");
+				//	CHAT_MSG* chat_msg;
+				//	chat_msg = (CHAT_MSG*)comm_msg;
+				//	fwrite(chat_msg->msg, sizeof(char*), sizeof(chat_msg->msg), fd);
+				//	fclose(fd);
+				// ==================
 				default:
 					break;
 			}
@@ -338,13 +339,24 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			// 데이터 받기
 			addrlen = sizeof(clientaddr);
 			retval = recvfrom(socket_UDP, buf, BUFSIZE, 0, (SOCKADDR*)&clientaddr, &addrlen);
-			printf("[UDP] 데이터 길이 : %d, 데이터 : %s\n", retval, buf);
+			printf("[UDP] 데이터 길이 : %d, 데이터 : %s\n", retval, ((COMM_MSG*)&buf)->dummy);
+			char msg[256];
+			strcpy(msg,((COMM_MSG*)&buf)->dummy);
 			if (retval == SOCKET_ERROR) {
 				err_display("recvfrom()");
 				return;
 			}
 			// ======== 연경 =======
-			addMessage(buf);
+			COMM_MSG* comm_msg = (COMM_MSG*)&buf;
+			switch (comm_msg->type) {
+			case TYPE_CHAT:
+				printf("채팅입니다\n");
+				FILE* fd = fopen("chatting_log.txt", "w");
+				fwrite(msg, sizeof(char), strlen(msg), fd);
+				fclose(fd);
+				break;
+			}
+
 			// ====================
 
 			// UDP로 접속한 클라 정보 수집
