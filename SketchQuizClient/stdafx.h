@@ -182,6 +182,10 @@ static HWND			hwndHome_Notice;	// 공지사항 입력 윈도우
 #define MODE_DIAMOND		4511
 #define MODE_ARROW			4512
 
+// UDP 그룹 번호
+#define TYPE_GROUP_A		1000000
+#define TYPE_GROUP_B		2000000
+
 // 현재 그리기 모드 전역 변수
 static int g_currentSelectFigureMode = MODE_LINE;
 

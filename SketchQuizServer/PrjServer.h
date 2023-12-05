@@ -22,6 +22,17 @@
 // ==== 정호 ====
 #define WM_SOCKET (WM_USER+1)
 
+// UDP 그룹 번호
+#define TYPE_GROUP_A		1000000
+#define TYPE_GROUP_B		2000000
+
+// UDP 클라 정보
+typedef struct _UDPINFO
+{
+	SOCKADDR_IN addr;
+	int groupNum = 0;
+} UDPINFO;
+
 // 소켓 정보 저장을 위한 구조체와 변수
 typedef struct _SOCKETINFO
 {
