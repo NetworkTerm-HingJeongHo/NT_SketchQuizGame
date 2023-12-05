@@ -98,7 +98,6 @@ INT_PTR CALLBACK DlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	static HWND hEditIPaddr;
 	static HWND hEditPort;
 	static HWND hChkIsUDP;
-	static HWND hBtnConnect;
 	static HWND hBtnSendFile; // 전역 변수에도 저장
 	static HWND hBtnSendMsg; // 전역 변수에도 저장
 	static HWND hEditMsg;
@@ -125,11 +124,8 @@ INT_PTR CALLBACK DlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	switch (uMsg) {
 	case WM_INITDIALOG:
 		// 컨트롤 핸들 얻기
-		hChkIsIPv6 = GetDlgItem(hDlg, IDC_ISIPV6);
 		hEditIPaddr = GetDlgItem(hDlg, IDC_IPADDR);
 		hEditPort = GetDlgItem(hDlg, IDC_PORT);
-		hChkIsUDP = GetDlgItem(hDlg, IDC_ISUDP);
-		hBtnConnect = GetDlgItem(hDlg, IDC_CONNECT);
 		hBtnSendFile = GetDlgItem(hDlg, IDC_SENDFILE);
 		g_hBtnSendFile = hBtnSendFile; // 전역 변수에 저장
 		hBtnSendMsg = GetDlgItem(hDlg, IDC_SENDMSG);
@@ -141,8 +137,6 @@ INT_PTR CALLBACK DlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		g_hBtnErasePic = hBtnErasePic; // 전역 변수에 저장
 		hStaticDummy = GetDlgItem(hDlg, IDC_DUMMY);
 		
-
-
 		// ========= 연경 =========
 		g_hTimerStatus = GetDlgItem(hDlg, IDC_EDIT_TIMER);  // 타이머 표시하는 EditText 부분 
 		g_hWordStatus = GetDlgItem(hDlg, IDC_EDIT_WORD);    // 제시어 표시하는 EditText 부분
@@ -178,6 +172,8 @@ INT_PTR CALLBACK DlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		EnableWindow(g_hBtnSendMsg, FALSE);
 		SendMessage(hEditMsg, EM_SETLIMITTEXT, SIZE_DAT / 2, 0);
 		EnableWindow(g_hBtnErasePic, FALSE);
+		EnableWindow(hEditIPaddr, FALSE);
+		EnableWindow(hEditPort, FALSE);
 
 		// ========= 지윤 =========
 		EnableWindow(g_hBtnPenColor, FALSE);
@@ -191,9 +187,6 @@ INT_PTR CALLBACK DlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		AddFigureOption(hDlg);
 		EnableWindow(g_hFigureSelect, FALSE);
 		//
-
-		
-
 
 		// ========= 
 		// 컨트롤 상태 얻기
@@ -255,28 +248,15 @@ INT_PTR CALLBACK DlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		if (g_hDrawWnd == NULL) exit(1);
 		ShowWindow(g_hDrawWnd, SW_SHOW);
 		UpdateWindow(g_hDrawWnd);
-		// 컨트롤 상태 변경
-		EnableWindow(hChkIsIPv6, FALSE);
-		EnableWindow(hEditIPaddr, FALSE);
-		EnableWindow(hEditPort, FALSE);
-		EnableWindow(hChkIsUDP, FALSE);
-		EnableWindow(hBtnConnect, FALSE);
-		EnableWindow(g_hBtnSendFile, TRUE);
-		EnableWindow(g_hBtnSendMsg, TRUE);
-		SetFocus(hEditMsg);
-		EnableWindow(g_hBtnErasePic, TRUE);
-
-		// ========= 지윤 =========
-		EnableWindow(g_hBtnPenColor, TRUE);
-		EnableWindow(g_hLineWidth, TRUE);
-		ShowWindow(g_hDrawingTextId, SW_SHOW);
-		ShowWindow(g_hDrawingText, SW_SHOW);
-
-
 		return TRUE;
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDC_GAMESTART:
+			// 컨트롤 상태 변경
+			EnableWindow(g_hBtnSendFile, TRUE);
+			EnableWindow(g_hBtnSendMsg, TRUE);
+			SetFocus(hEditMsg);
+			EnableWindow(g_hBtnErasePic, TRUE);
 
 			// ========= 연경 =========
 
@@ -298,7 +278,10 @@ INT_PTR CALLBACK DlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			//
 
 			// ========= 지윤 =========
-
+			EnableWindow(g_hBtnPenColor, TRUE);
+			EnableWindow(g_hLineWidth, TRUE);
+			ShowWindow(g_hDrawingTextId, SW_SHOW);
+			ShowWindow(g_hDrawingText, SW_SHOW);
 			//DisplayDrawingUserID(hDlg, userIDs);
 
 			return TRUE;
