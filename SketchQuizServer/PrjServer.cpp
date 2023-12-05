@@ -1,21 +1,5 @@
 #include "stdafx.h"
 
-// // =========== 정호 =============
-// 클라이언트 관리 배열
-int nTotalSockets = 0;
-int nTotalUDPSockets = 0;
-SOCKETINFO* SocketInfoArray[FD_SETSIZE]; //TCP 유저들 있는 변수
-SOCKADDR_IN UDPSocketInfoArray[FD_SETSIZE]; //UDP 유저들 있는 변수
-
-SOCKET listen_sock4;
-SOCKADDR_IN serveraddr;
-SOCKET socket_UDP;
-
-// ============= 연경 =============== 
-//char* g_msgQueue[BUFSIZE];    // 메시지 원형 큐: 이전 대화내용 표시. 꽉 차면 가장 오래된 메시지부터 지워진다.
-//int head = 0, tail = 0;           // 원형 큐 인덱스
-MESSAGEQUEUE g_msgQueue;
-
 int main(int argc, char* argv[])
 {
 	// ========= 정호 ========
@@ -171,6 +155,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				// 선택한 클라이언트를 제거하는 코드 추가
 				int portToRemove = g_selectedIndex;
 				RemoveClientFromListView(portToRemove);
+				RemoveSocketByPort(portToRemove);
 
 				// 선택을 해제하고 g_selectedIndex를 초기화
 				ListView_SetItemState(g_hListView, g_selectedIndex, 0, LVIS_SELECTED);
