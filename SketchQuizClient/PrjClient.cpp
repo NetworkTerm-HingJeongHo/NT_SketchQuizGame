@@ -11,9 +11,6 @@ int channel;	//udp 채널 가져오기. stdafx.h 파일에 같은 주소에 저장하기 위함
 
 //-------------------------------//
 
-// ================ ji yoon ================
-static BOOL			 g_isLogin = FALSE;		  // 로그인 여부
-
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
 	// 윈속 초기화
@@ -71,14 +68,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	RegisterClass(&wcHome_Pass);
 
 	//------------------//
-	
-	// 메인 윈도우(첫 화면) 생성
-	WNDCLASSEX wcex = { sizeof(WNDCLASSEX), CS_HREDRAW | CS_VREDRAW, MainWndProc, 0, 0, GetModuleHandle(NULL), NULL, NULL, NULL, NULL, _T("MainWindow"), NULL };
-	RegisterClassEx(&wcex);
-	g_hMainWindow = CreateWindow(_T("MainWindow"), _T("Main Window"), WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 500, 200, NULL, NULL, hInstance, NULL);
-
-	ShowWindow(g_hMainWindow, nCmdShow);
-	UpdateWindow(g_hMainWindow);
+		// 로그인 창 생성
+	hwndLogin = CreateWindow(_T("LoginWindowClass"), _T("로그인 창"), WS_OVERLAPPEDWINDOW,
+		CW_USEDEFAULT, CW_USEDEFAULT, 1280, 720, NULL, NULL, g_hInstance, NULL);
+	ShowWindow(hwndLogin, SW_SHOW);
+	UpdateWindow(hwndLogin);
 
 
 	// 메시지 루프
@@ -87,12 +81,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	{
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
-
-		// ================ 지윤 ================
-		// 클라이언트 소켓이 닫혔을 때 프로그램 종료
-		//if (((WSAGETSELECTEVENT(msg.lParam) == FD_CLOSE)) && g_isLogin == TRUE){
-		//	PostQuitMessage(0);
-		//}
 	}
 
 	// 이벤트 객체 제거
@@ -100,53 +88,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	CloseHandle(g_hWriteEvent);
 	// 윈속 종료
 	WSACleanup();
-	return 0;
-}
-
-// 메인 윈도우 프로시저
-LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	switch (message)
-	{
-	case WM_CREATE:
-	{
-		// '그림판' 버튼 생성
-		CreateWindow(_T("BUTTON"), _T("그림판"), WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON, 10, 10, 100, 30, hWnd, (HMENU)1, g_hInstance, NULL);
-
-		// '로그인' 버튼 생성
-		CreateWindow(_T("BUTTON"), _T("로그인"), WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON, 120, 10, 100, 30, hWnd, (HMENU)2, g_hInstance, NULL);
-
-		// '랭킹' 버튼 생성 (세 번째로 위치)
-		CreateWindow(_T("BUTTON"), _T("랭킹"), WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON, 230, 10, 100, 30, hWnd, (HMENU)4, g_hInstance, NULL);
-
-		// '메인' 버튼 생성 (네 번째로 위치)
-		CreateWindow(_T("BUTTON"), _T("메인"), WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON, 340, 10, 100, 30, hWnd, (HMENU)3, g_hInstance, NULL);
-		break;
-	}
-	case WM_COMMAND:
-	{
-		if (LOWORD(wParam) == 1) // '그림판' 버튼 클릭
-		{
-			CreateAndShowDialog(hWnd);
-		}
-		//---지안 ----//
-		else if (LOWORD(wParam) == 2) // '로그인' 버튼 클릭
-		{
-			CreateAndShowWindow_Login(hwndLogin);
-		}
-		else if (LOWORD(wParam) == 3) // '메인' 버튼 클릭
-		{
-			CreateAndShowWindow_Home(hwndHome); // 메인 생성
-		}
-		//-----------//
-		break;
-	}
-	case WM_DESTROY:
-		PostQuitMessage(0);
-		break;
-	default:
-		return DefWindowProc(hWnd, message, wParam, lParam);
-	}
 	return 0;
 }
 
@@ -736,6 +677,7 @@ LRESULT CALLBACK ChildWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 LRESULT CALLBACK LoginWndProc(HWND hwndLogin, UINT msg, WPARAM wParam, LPARAM lParam) {
 	
 	int retval;
+
 	switch (msg) {
 
 	case WM_CREATE:
@@ -782,7 +724,6 @@ LRESULT CALLBACK LoginWndProc(HWND hwndLogin, UINT msg, WPARAM wParam, LPARAM lP
 
 			// ==================== 지윤 ====================
 			AddUser(userIDs, input_result);
-			g_isLogin = TRUE;
 			// ==============================================
 
 			CreateAndShowWindow_Home(hwndHome); // 메인 생성 및 보이게하기
@@ -869,6 +810,7 @@ LRESULT CALLBACK LoginWndProc(HWND hwndLogin, UINT msg, WPARAM wParam, LPARAM lP
 LRESULT CALLBACK HomeWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	static HWND hAChannelDlg = NULL;
 	static HWND hBChannelDlg = NULL;
+
 	switch (msg) {
 
 	case WM_CREATE:
