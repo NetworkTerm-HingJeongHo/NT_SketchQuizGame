@@ -3,3 +3,4 @@
 [asdf] 님이 입장하였습니다!
 {asdf} aaaaaaa
 {asdf} gggggggggggg
+{asdf} asdfsadfsadfsadf
