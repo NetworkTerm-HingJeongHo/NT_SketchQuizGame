@@ -290,6 +290,51 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				NOTICE_MSG* notice_msg;
 				notice_msg = (NOTICE_MSG*)&(ptr->buf); // NOTICE_MSG : 공지사항으로 형변환
 				printf("[TYPE_NOTICE 받은 데이터] %s\n", notice_msg->msg);
+				printf("[TYPE_NOTICE 번호 ] %d\n", notice_msg->type);
+
+
+				// ----- UDP 소켓이 데이터를 브로드캐스트해서 공지사항을 보낸다. ------- //
+				NOTICE_MSG notice_msg_send;
+				notice_msg_send.type = TYPE_NOTICE;	// notice (공지사항) 타입
+				strcpy(notice_msg_send.msg, notice_msg->msg);	// msg에 공지사항 내용을 넣는다. (char)
+				
+				// 데이터 보내기
+				#define REMOTEIP   "255.255.255.255" //로컬 브로드캐스트
+
+					// socket()
+				SOCKET sock;
+				sock = socket(AF_INET, SOCK_DGRAM, 0);
+				if (sock == INVALID_SOCKET) err_quit("socket()");
+
+				// 브로드캐스팅 활성화
+				BOOL bEnable;
+				bEnable= TRUE;
+				retval = setsockopt(sock, SOL_SOCKET, SO_BROADCAST,
+					(char*)&bEnable, sizeof(bEnable));
+				if (retval == SOCKET_ERROR) err_quit("setsockopt()");
+				
+
+				// 데이터 보내기
+				for (int i = 0; i < nTotalUDPSockets; i++)
+				{
+					// 모든 소켓에 데이터 전송
+					UDPINFO* clientUDP = UDPSocketInfoArray[i];
+					printf("send groupNumUDP : %d, clientUDP->GroupNum : %d\n", groupNumUDP, clientUDP->groupNum);
+
+					// 데이터 보내기
+					retval = sendto(sock, (char*)&notice_msg_send, BUFSIZE, 0, (SOCKADDR*)&clientUDP->addr, sizeof(clientUDP->addr));
+					if (retval == SOCKET_ERROR) {
+						err_display("sendto()");
+						return;
+					}
+				}
+
+				printf("[UDP] %d바이트를 보냈습니다. type : %d 보낸 데이터 : %s\n", retval, notice_msg_send.type,notice_msg_send.msg);
+				// closesocket()
+				closesocket(sock);
+
+				// ----------------------------------------------------------------- //
+
 				break;
 			case (TYPE_ID_RESULT):	// TYPE_ID 인 경우 (id 출력)
 				// ***  형변환 *** //
