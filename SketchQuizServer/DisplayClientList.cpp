@@ -3,7 +3,7 @@
 void InitializeListView(HWND hWnd) {
     g_hListView = CreateWindowEx(0, WC_LISTVIEW, _T("Client List"),
         WS_CHILD | WS_VISIBLE | WS_BORDER | LVS_REPORT | LVS_SINGLESEL,
-        10, 10, 200, 200, hWnd, NULL, NULL, NULL);
+        10, 10, 200, 240, hWnd, NULL, NULL, NULL);
 
     // 첫 번째 열 추가
     LVCOLUMN lvc1;
@@ -23,11 +23,6 @@ void InitializeListView(HWND hWnd) {
     ListView_SetExtendedListViewStyle(g_hListView, LVS_EX_FULLROWSELECT);
 }
 
-// 클라이언트 목록 인덱스와 해당 소켓 저장
-void AddClientSocketAndIndex(int index, SOCKET sock) {
-    tmp_ClientSock[index] = sock;
-}
-
 void AddClientToListView(int port, _TCHAR* id, SOCKET sock) {
     LVITEM lvItem = { 0 };
     lvItem.mask = LVIF_TEXT | LVIF_PARAM;
@@ -44,9 +39,6 @@ void AddClientToListView(int port, _TCHAR* id, SOCKET sock) {
 
     // 두 번째 열에 ID 추가
     ListView_SetItemText(g_hListView, index, 1, id);
-
-    // 클라이언트 목록 인덱스와 해당 소켓 저장
-    AddClientSocketAndIndex(index, sock);
 
     DisplayClientList();
 }
@@ -73,8 +65,4 @@ void RemoveClientFromListView(int port) {
         ListView_DeleteItem(g_hListView, index);
     }
     DisplayClientList();
-}
-
-void RemoveClientFromListViewAndSock(int index) {
-    RemoveSocketInfo(tmp_ClientSock[index]);
 }
