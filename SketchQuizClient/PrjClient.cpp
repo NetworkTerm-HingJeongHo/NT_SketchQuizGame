@@ -141,6 +141,7 @@ INT_PTR CALLBACK DlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		g_hTimerStatus = GetDlgItem(hDlg, IDC_EDIT_TIMER);  // 타이머 표시하는 EditText 부분 
 		g_hWordStatus = GetDlgItem(hDlg, IDC_EDIT_WORD);    // 제시어 표시하는 EditText 부분
 		hBtnGameStart = GetDlgItem(hDlg, IDC_GAMESTART);
+		roundNum = 0;
 		//EnableWindow(hBtnGameStart, FALSE);
 
 		g_hDrawDlg = hDlg;
@@ -264,14 +265,28 @@ INT_PTR CALLBACK DlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			//SetEvent(g_hWriteEvent);
 			//isMessageQueue = TRUE;
 			// 이전에 얻은 채팅 메시지 읽기 완료를 기다림
-
+			roundNum += 1;
 			EnableWindow(hBtnGameStart, TRUE);
 			// 이전에 얻은 채팅 메시지 읽기 완료를 기다림
 			WaitForSingleObject(g_hReadEvent, INFINITE);
 			// 새로운 채팅 메시지를 얻고 쓰기 완료를 알림
 			g_chatmsg.type = TYPE_START;
-			strcpy(g_chatmsg.msg, "게임이 시작됩니다!");
+			strcpy(g_chatmsg.msg, "새 게임이 시작됩니다!");
 			SetEvent(g_hWriteEvent);
+
+
+			//if (isOwner == TRUE) {
+			//	WideCharToMultiByte(CP_ACP, 0, quizWord[roundNum], 10, roundText, 10, NULL, NULL);
+			//	SetDlgItemTextA(hDlg, IDC_EDIT_WORD, roundText);
+			//	
+			//}
+			//else {
+			//	SetDlgItemTextA(hDlg, IDC_EDIT_WORD, "-");
+			//}
+
+			/*WideCharToMultiByte(CP_ACP, 0, quizWord[roundNum], 10, roundText, 10, NULL, NULL);
+			SetDlgItemTextA(hDlg, IDC_EDIT_WORD, roundText);*/
+
 			//	gameStart(g_hTimerStatus, g_hWordStatus);
 			// ========= 정호 =========
 			EnableWindow(g_hFigureSelect, TRUE);
@@ -295,9 +310,18 @@ INT_PTR CALLBACK DlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			// 이전에 얻은 채팅 메시지 읽기 완료를 기다림
 			WaitForSingleObject(g_hReadEvent, INFINITE);
 			// 새로운 채팅 메시지를 얻고 쓰기 완료를 알림
-			GetDlgItemTextA(hDlg, IDC_MSG, g_chatmsg.msg, SIZE_DAT);
+			snprintf(g_chatmsg.msg, sizeof(g_chatmsg), "총 %d 점을 획득했습니다!\r\n", score);
 			SetEvent(g_hWriteEvent);
 			// 입력된 텍스트 전체를 선택 표시
+
+			if (isGameOver == TRUE) {
+
+				WaitForSingleObject(g_hReadEvent, INFINITE);
+				// 새로운 채팅 메시지를 얻고 쓰기 완료를 알림
+				g_chatmsg.type = TYPE_CHAT;
+				
+				SetEvent(g_hWriteEvent);
+			}
 			SendMessage(hEditMsg, EM_SETSEL, 0, -1);
 			return TRUE;
 		case IDC_ERASEPIC:
@@ -1308,6 +1332,7 @@ DWORD WINAPI ReadThread(LPVOID arg)
 		retval = recvn(g_sock, (char*)&comm_msg, BUFSIZE, 0, serveraddr, g_isUDP);
 
 		char selectedName[256];
+		char roundText[20];
 		if (retval == 0 || retval == SOCKET_ERROR) {
 			err_display("recv()");
 			break;
@@ -1353,10 +1378,14 @@ DWORD WINAPI ReadThread(LPVOID arg)
 
 			WideCharToMultiByte(CP_ACP, 0, quizWord[roundNum], 10, word, 10, NULL, NULL);
 			if (strcmp(sendMsg, word) == 0) {  // 제시어를 맞춘 경우: 정답임을 출력하고 새 라운드 시작
-
 				DisplayText("[%s] 정답입니다!\r\n", word);
-				newRound();
+				roundNum += 1;
+				if (roundNum > maxRound) {
+					DisplayText("게임이 종료되었습니다\r\n");
+					isGameOver = TRUE;
+				}
 			}
+
 
 			break;
 		case TYPE_ENTER:
@@ -1371,16 +1400,24 @@ DWORD WINAPI ReadThread(LPVOID arg)
 		case TYPE_SELECT:
 			strcpy(selectedName, comm_msg.dummy);
 			_TCHAR selectedName_T[BUFSIZE];
+			MultiByteToWideChar(CP_ACP, 0, selectedName, -1, selectedName_T, BUFSIZE);
+			DisplayDrawingUserID(g_hDrawDlg, selectedName_T);
 			if (strcmp(selectedName, NICKNAME_CHAR) == 0) {  // 만약 현재 클라이언트가 선택되었다면
 				// char* 형 문자열을 _TCHAR 형 문자열로 변환
 				isOwner = TRUE; // 그림 그리는 사람(Owner)임을 TRUE 체크
+
+				WideCharToMultiByte(CP_ACP, 0, quizWord[roundNum], 10, roundText, 10, NULL, NULL);
+				SetDlgItemTextA(g_hDrawDlg, IDC_EDIT_WORD, roundText);
+
+				ShowWindow(g_hDrawWnd, SW_SHOW);
+				UpdateWindow(g_hDrawWnd);
 			}
 			else {
 				isOwner = FALSE;
+				SetDlgItemTextA(g_hDrawDlg, IDC_EDIT_WORD, "-");
+				ShowWindow(g_hDrawWnd, SW_HIDE);
+				UpdateWindow(g_hDrawWnd);
 			}
-
-			MultiByteToWideChar(CP_ACP, 0, selectedName, -1, selectedName_T, BUFSIZE);
-			DisplayDrawingUserID(g_hDrawDlg, selectedName_T);
 			//if (_tcscpy(ptr->id_nickname, selectedName_T) == NULL) {
 			//	// Handle the error
 			//	err_display("setIDInSocket");
