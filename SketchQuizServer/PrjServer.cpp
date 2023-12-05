@@ -367,6 +367,26 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			// ======== 연경 =======
 			COMM_MSG* comm_msg = (COMM_MSG*)&buf;
 			switch (comm_msg->type) {
+			case TYPE_NOTY:
+			case TYPE_ENTER: { //입장했다는 메시지인 경우 해당 클라이언트에게 이전 메시지 내용 전송
+				UDPINFO* clientUDP = UDPSocketInfoArray[nTotalSockets - 1];  //가장 최근 접속한 소켓
+				COMM_MSG sendMsg;
+				sendMsg.type = TYPE_CHAT;
+				FILE* sendFd = fopen("chatting_log.txt", "r");
+				printf("======== 이전 채팅 내용 ======= \n");
+				while (fgets(sendMsg.dummy, BUFSIZE, sendFd)) {
+					printf("%s\n", sendMsg.dummy);
+					// 데이터 보내기
+					retval = sendto(socket_UDP, (char*)&sendMsg, BUFSIZE, 0, (SOCKADDR*)&clientUDP, sizeof(clientUDP));
+					if (retval == SOCKET_ERROR) {
+						err_display("sendto()");
+						return;
+					}
+				}
+				printf("=========================\n");
+				fclose(sendFd);
+			}
+
 			case TYPE_CHAT:
 				printf("채팅입니다\n");
 				FILE* fd = fopen("chatting_log.txt", "w");
