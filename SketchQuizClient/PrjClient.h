@@ -1,12 +1,21 @@
 #pragma once
 
+/*
+	지안 - 2000번대
+	지윤 - 3000번대
+	정호 - 4000번대
+	연경 - 5000번대
+*/
 #define TYPE_CHAT     1000              // 메시지 타입: 채팅
 #define TYPE_DRAWLINE 1001              // 메시지 타입: 선 그리기
 #define TYPE_ERASEPIC 1002              // 메시지 타입: 그림 지우기
-#define TYPE_ID		  1003				// 메시지 타입: id (지안)
 #define TYPE_Queue    1004              // 메시지 타입: 메시지 큐(연경)
 #define TYPE_ENTER    1005              // 메시지 타입: 입장했을 경우->서버가 이를 알고 이전채팅내용전송
 #define TYPE_NOTY     1006  // 입장, 퇴장, 새 라운드 알림 메시지 출력
+// ====== 지안 ========= //
+#define TYPE_ID			2000				// 메시지 타입: id (지안)
+#define TYPE_ID_RESULT	2001				// 메시지 티입 : id 결과
+// ==================== //
 
 #define WM_DRAWLINE (WM_USER+1)         // 사용자 정의 윈도우 메시지(1)
 #define WM_ERASEPIC (WM_USER+2)         // 사용자 정의 윈도우 메시지(2)

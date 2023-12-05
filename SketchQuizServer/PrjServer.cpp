@@ -259,7 +259,6 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				// 만약 현재 받은 닉네임이 중복되지 않았다면 (ture)
 				if (CheckIDDuplication(nTotalSockets, SocketInfoArray, id_msg->msg)) {
 					printf("[TCP] 중복된 아이디 없음");
-					setIDInSocket(id_msg->msg, ptr); //id 등록
 					// ---- 클라이언트로 전송 ------//
 					size_t dataSize = strlen("true"); // 중복이 아니므로, "true" 클라이언트로 전송
 					retval = send(ptr->sock, "true", dataSize, 0);
@@ -297,6 +296,7 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				// *** 형변환 끝 *** //
 
 				// --------- 소켓 닉네임(ID) 저장하고, gui에 올리기 --------- //
+				setIDInSocket(id_result_msg->msg, ptr); //id 등록
 				printf("[TCP] TYPE_RESULT_ID, 현재 소켓 닉네임 등록완료 : %s\n", ptr->id_nickname_char);
 				printf("[TCP] TYPE_RESULT_ID, 현재 소켓 port 등록완료 : %d\n", ptr->sin_port);
 				printf("[TCP] TYPE_RESULT_ID, 현재 소켓 주소(char) : %s\n", inet_ntoa(ptr->sin_addr));
