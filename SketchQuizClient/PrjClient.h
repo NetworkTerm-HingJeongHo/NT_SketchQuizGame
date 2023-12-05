@@ -5,7 +5,8 @@
 #define TYPE_ERASEPIC 1002              // 메시지 타입: 그림 지우기
 #define TYPE_ID		  1003				// 메시지 타입: id (지안)
 #define TYPE_Queue    1004              // 메시지 타입: 메시지 큐(연경)
-#define TYPE_ID_RESULT 1005				// 메시지 티입 : id 결과
+#define TYPE_ENTER    1005              // 메시지 타입: 입장했을 경우->서버가 이를 알고 이전채팅내용전송
+#define TYPE_NOTY     1006  // 입장, 퇴장, 새 라운드 알림 메시지 출력
 
 #define WM_DRAWLINE (WM_USER+1)         // 사용자 정의 윈도우 메시지(1)
 #define WM_ERASEPIC (WM_USER+2)         // 사용자 정의 윈도우 메시지(2)

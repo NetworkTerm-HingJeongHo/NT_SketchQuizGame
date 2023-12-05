@@ -53,7 +53,6 @@ static HWND			 g_hDrawingText;     // 그림 그리는 사람 안내 문구
 
 // ============= 연경 =============
 // 채팅 관련 변수
-#define TYPE_NOTY 5000  // 입장, 퇴장, 새 라운드 알림 메시지 출력
 
 static HWND          g_hRankDlg;      // 랭킹 다이얼로그 핸들
 static HWND          g_hChattingDlg;  // 채팅 다이얼로그 핸들
