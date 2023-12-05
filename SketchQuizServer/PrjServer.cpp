@@ -347,6 +347,10 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			switch (comm_msg->type) {
 			case TYPE_NOTY:
 			case TYPE_ENTER: { //입장했다는 메시지인 경우 해당 클라이언트에게 이전 메시지 내용 전송
+				// ================= 지윤 =================
+				ClearChatListView();
+				// ========================================
+				
 				UDPINFO* clientUDP = UDPSocketInfoArray[nTotalSockets - 1];  //가장 최근 접속한 소켓
 				COMM_MSG sendMsg;
 				sendMsg.type = TYPE_CHAT;
@@ -355,11 +359,13 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					sendFd = fopen("chatting_log_1.txt", "r");
 				else 
 					sendFd = fopen("chatting_log_2.txt", "r");
-					
+				
 				printf("======== 이전 채팅 내용 ======= \n");
 				while (fgets(sendMsg.dummy, BUFSIZE, sendFd)) {
 					printf("%s\n", sendMsg.dummy);
+					// ================= 지윤 =================
 					AddChatMessageToListView(sendMsg.dummy);
+					// ========================================
 					// 데이터 보내기
 					if (groupNumUDP == clientUDP->groupNum)
 					{
@@ -392,6 +398,9 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				char n = '\n';
 				fwrite(msg, sizeof(char), strlen(msg), fd);
 				fwrite(&n, sizeof(char), sizeof(n), fd);
+				// ================= 지윤 =================
+				AddChatMessageToListView(msg);
+				// ========================================
 				fclose(fd);
 				break;
 
