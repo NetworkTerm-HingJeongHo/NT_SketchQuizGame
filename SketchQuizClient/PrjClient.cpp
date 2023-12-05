@@ -719,7 +719,7 @@ LRESULT CALLBACK LoginWndProc(HWND hwndLogin, UINT msg, WPARAM wParam, LPARAM lP
 			}
 
 			// --------------------------------------------- //
-			MessageBox(hwndLogin, ID_NICKNAME, _T("메인 화면으로 이동합니다."), MB_OK);
+			//MessageBox(hwndLogin, ID_NICKNAME, _T("메인 화면으로 이동합니다."), MB_OK);
 
 			// ==================== 지윤 ====================
 			AddUser(userIDs, input_result);
@@ -1336,7 +1336,21 @@ DWORD WINAPI ReadThread(LPVOID arg)
 
 		switch (comm_msg.type)
 		{
+		// ============== 지안 ================ //
+		case TYPE_NOTICE:
+			_TCHAR notice_msg_Tchar[BUFSIZE];
+			NOTICE_MSG* notice_msg;
+			notice_msg = (NOTICE_MSG*)&comm_msg;
 
+			// char* 형 문자열을 _TCHAR 형 문자열로 변환
+			MultiByteToWideChar(CP_ACP, 0, notice_msg->msg, -1, notice_msg_Tchar, BUFSIZE);
+
+
+			//MessageBox(NULL, notice_msg_Tchar, _T("UDP 데이터를 받았어요."), MB_OK);
+			DisplayText("[ 공지 ] %s\r\n", notice_msg->msg);
+			break;
+		// ==================================== //
+			
 			// ============ 연경 ==========
 		case TYPE_CHAT:
 			chat_msg = (CHAT_MSG*)&comm_msg;
