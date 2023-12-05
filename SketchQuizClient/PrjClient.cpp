@@ -206,7 +206,7 @@ INT_PTR CALLBACK DlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		g_hTimerStatus = GetDlgItem(hDlg, IDC_EDIT_TIMER);  // 타이머 표시하는 EditText 부분 
 		g_hWordStatus = GetDlgItem(hDlg, IDC_EDIT_WORD);    // 제시어 표시하는 EditText 부분
 		hBtnGameStart = GetDlgItem(hDlg, IDC_GAMESTART);
-		EnableWindow(hBtnGameStart, FALSE);
+		//EnableWindow(hBtnGameStart, FALSE);
 
 		g_hDrawDlg = hDlg;
 		WideCharToMultiByte(CP_ACP, 0, ID_NICKNAME, 256, NICKNAME_CHAR, 256, NULL, NULL); //_TCHAR 형 문자열을 char* 형 문자열로 변경
@@ -338,18 +338,17 @@ INT_PTR CALLBACK DlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		case IDC_GAMESTART:
 
 			// ========= 연경 =========
-			EnableWindow(hBtnGameStart, TRUE);
 
 			//WaitForSingleObject(g_hReadEvent, INFINITE);
 			//SetEvent(g_hWriteEvent);
 			//isMessageQueue = TRUE;
 			// 이전에 얻은 채팅 메시지 읽기 완료를 기다림
 
-			EnableWindow(hBtnGameStart, FALSE);
+			EnableWindow(hBtnGameStart, TRUE);
 			// 이전에 얻은 채팅 메시지 읽기 완료를 기다림
 			WaitForSingleObject(g_hReadEvent, INFINITE);
 			// 새로운 채팅 메시지를 얻고 쓰기 완료를 알림
-			g_chatmsg.type = TYPE_NOTY;
+			g_chatmsg.type = TYPE_START;
 			strcpy(g_chatmsg.msg, "게임이 시작됩니다!");
 			SetEvent(g_hWriteEvent);
 			//	gameStart(g_hTimerStatus, g_hWordStatus);
@@ -359,7 +358,7 @@ INT_PTR CALLBACK DlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 			// ========= 지윤 =========
 
-			DisplayDrawingUserID(hDlg, userIDs);
+			//DisplayDrawingUserID(hDlg, userIDs);
 
 			return TRUE;
 		case IDC_SENDFILE:
@@ -1206,7 +1205,8 @@ DWORD WINAPI ClientMain(LPVOID arg)
 			group1Connect.type = 0;
 			group1Connect.groupNum = TYPE_GROUP_A;
 			g_UDPGroupNum = TYPE_GROUP_A;
-			char buf[BUFSIZE + 1] = "hello, I'am UDP JIAN. UDP Channel1 !!";
+			char buf[BUFSIZE + 1];
+			strcpy(buf,NICKNAME_CHAR);
 			memcpy(group1Connect.dummy, buf, sizeof(group1Connect.dummy));
 
 			// 기타 데이터들 그룹 초기화
@@ -1382,6 +1382,7 @@ DWORD WINAPI ReadThread(LPVOID arg)
 		//}
 		retval = recvn(g_sock, (char*)&comm_msg, BUFSIZE, 0, serveraddr, g_isUDP);
 
+		char selectedName[256];
 		if (retval == 0 || retval == SOCKET_ERROR) {
 			err_display("recv()");
 			break;
@@ -1422,10 +1423,31 @@ DWORD WINAPI ReadThread(LPVOID arg)
 			chat_msg = (CHAT_MSG*)&comm_msg;
 			DisplayText("%s\r\n", chat_msg->msg);
 			break;
+		case TYPE_START:
 		case TYPE_NOTY:
 			chat_msg = (CHAT_MSG*)&comm_msg;
 			DisplayText("%s\r\n", chat_msg->msg);
 			break;
+		case TYPE_SELECT:
+			strcpy(selectedName, comm_msg.dummy);
+			_TCHAR selectedName_T[BUFSIZE];
+			if (strcmp(selectedName, NICKNAME_CHAR) == 0) {  // 만약 현재 클라이언트가 선택되었다면
+				// char* 형 문자열을 _TCHAR 형 문자열로 변환
+				isOwner = TRUE; // 그림 그리는 사람(Owner)임을 TRUE 체크
+			}
+			else {
+				isOwner = FALSE;
+			}
+
+			MultiByteToWideChar(CP_ACP, 0, selectedName, -1, selectedName_T, BUFSIZE);
+			DisplayDrawingUserID(g_hDrawDlg, selectedName_T);
+			//if (_tcscpy(ptr->id_nickname, selectedName_T) == NULL) {
+			//	// Handle the error
+			//	err_display("setIDInSocket");
+			//}
+			break;
+		// =================================
+
 		case TYPE_DRAWLINE:
 			drawline_msg = (DRAWLINE_MSG*)&comm_msg;
 			// ============ 지윤 ============

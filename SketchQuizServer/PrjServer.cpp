@@ -356,7 +356,7 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			if (groupNumUDP == -1)
 			{
 				// UDP로 접속한 클라 정보 수집
-				AddSocketInfoUDP(clientaddr, ((COMM_MSG*)&buf)->groupNum);
+				AddSocketInfoUDP(clientaddr, ((COMM_MSG*)&buf)->groupNum, ((COMM_MSG*)&buf)->dummy);
 			}
 
 			printf("[UDP] 데이터 길이 : %d, 데이터 : %s\n", retval, ((COMM_MSG*)&buf)->dummy);
@@ -403,21 +403,57 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				}
 				printf("=========================\n");
 				fclose(sendFd);
+				break;
 			}
-			case TYPE_START:
+			case TYPE_START: {
+				int randomIndex;
+				while (true) {
+
+					// 시드값 설정
+					srand((unsigned)time(NULL));
+
+					// 랜덤 인덱스 생성
+					randomIndex = rand() % nTotalSockets;
+					if (UDPSocketInfoArray[randomIndex]->groupNum == groupNumUDP) break;  // 같은 그룹 내에서 선택 성공한 경우 빠져나오기
+				}
+				// 랜덤으로 선택된 사용자 아이디 반환
+				char* selectedName = UDPSocketInfoArray[randomIndex]->id_nickname;
+
+				for (int i = 0; i < nTotalUDPSockets; i++)
+				{
+					COMM_MSG sendMsg;
+					sendMsg.type = TYPE_SELECT;
+					strcpy(sendMsg.dummy, selectedName);
+					// 같은 그룹에만 데이터 전송
+					UDPINFO* clientUDP = UDPSocketInfoArray[i];
+					printf("send groupNumUDP : %d, clientUDP->GroupNum : %d\n", groupNumUDP, clientUDP->groupNum);
+					if (groupNumUDP == clientUDP->groupNum)
+					{
+						// 데이터 보내기
+						retval = sendto(socket_UDP, (char*)&sendMsg, BUFSIZE, 0, (SOCKADDR*)&clientUDP->addr, sizeof(clientUDP->addr));
+						if (retval == SOCKET_ERROR) {
+							err_display("sendto()");
+							return;
+						}
+						printf("sendto retval : %d\n", retval);
+					}
+				}
+				break;
+			}
 
 
-			case TYPE_CHAT:
+			case TYPE_CHAT: {
 				FILE* fd;
-				if(comm_msg->groupNum== TYPE_GROUP_A)
+				if (comm_msg->groupNum == TYPE_GROUP_A)
 					fd = fopen("chatting_log_1.txt", "a");
-				else 
+				else
 					fd = fopen("chatting_log_2.txt", "a");
 				char n = '\n';
 				fwrite(msg, sizeof(char), strlen(msg), fd);
 				fwrite(&n, sizeof(char), sizeof(n), fd);
 				fclose(fd);
 				break;
+			}
 
 			}
 
@@ -493,7 +529,7 @@ SOCKETINFO* GetSocketInfo(SOCKET sock)
 }
 
 // UDP 클라 정보 추가
-bool AddSocketInfoUDP(SOCKADDR_IN addr, int groupNum)
+bool AddSocketInfoUDP(SOCKADDR_IN addr, int groupNum, char* id_nickname)
 {
 	// 이전에 접속한 적이 있는 상태인지 확인
 	for (int i = 0; i < nTotalUDPSockets; i++)
@@ -518,6 +554,7 @@ bool AddSocketInfoUDP(SOCKADDR_IN addr, int groupNum)
 	}
 	newUDPClient->addr = addr;
 	newUDPClient->groupNum = groupNum;
+	strcpy(newUDPClient->id_nickname, id_nickname);
 
 	// UDP 클라 정보 추가
 	UDPSocketInfoArray[nTotalUDPSockets++] = newUDPClient;
