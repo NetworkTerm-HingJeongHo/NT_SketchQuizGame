@@ -306,23 +306,29 @@ INT_PTR CALLBACK DlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			// 전송할 파일을 선택한다. 2. 선택한 파일을 읽어서 서버에 전송한다.
 			return TRUE;
 		case IDC_SENDMSG:
+			// 입력된 텍스트 전체를 선택 표시
 			g_chatmsg.type = TYPE_CHAT;
 			// 이전에 얻은 채팅 메시지 읽기 완료를 기다림
 			WaitForSingleObject(g_hReadEvent, INFINITE);
 			// 새로운 채팅 메시지를 얻고 쓰기 완료를 알림
-			snprintf(g_chatmsg.msg, sizeof(g_chatmsg), "총 %d 점을 획득했습니다!\r\n", score);
+			GetDlgItemTextA(hDlg, IDC_MSG, g_chatmsg.msg, SIZE_DAT);
 			SetEvent(g_hWriteEvent);
 			// 입력된 텍스트 전체를 선택 표시
+			SendMessage(hEditMsg, EM_SETSEL, 0, -1);
 
-			if (isGameOver == TRUE) {
+			if (isGameOver == TRUE || roundNum>=maxRound) {
 
 				WaitForSingleObject(g_hReadEvent, INFINITE);
 				// 새로운 채팅 메시지를 얻고 쓰기 완료를 알림
 				g_chatmsg.type = TYPE_CHAT;
+				// 이전에 얻은 채팅 메시지 읽기 완료를 기다림
+				WaitForSingleObject(g_hReadEvent, INFINITE);
+				// 새로운 채팅 메시지를 얻고 쓰기 완료를 알림
+				snprintf(g_chatmsg.msg, sizeof(g_chatmsg), "총 %d 점을 획득했습니다!\r\n", score);
+				SetEvent(g_hWriteEvent);
 				
 				SetEvent(g_hWriteEvent);
 			}
-			SendMessage(hEditMsg, EM_SETSEL, 0, -1);
 			return TRUE;
 		case IDC_ERASEPIC:
 			send(g_sock, (char*)&g_erasepicmsg, SIZE_TOT, 0);
@@ -1206,7 +1212,8 @@ DWORD WINAPI ClientMain(LPVOID arg)
 			group2Connect.type = 0;
 			group2Connect.groupNum = TYPE_GROUP_B;
 			g_UDPGroupNum = TYPE_GROUP_B;
-			char buf[BUFSIZE + 1] = "hello, I'am UDP JIAN. UDP Channel2 !!";
+			char buf[BUFSIZE + 1];
+			strcpy(buf, NICKNAME_CHAR);
 			memcpy(group2Connect.dummy, buf, sizeof(group2Connect.dummy));
 
 			// 기타 데이터들 그룹 초기화
@@ -1399,6 +1406,10 @@ DWORD WINAPI ReadThread(LPVOID arg)
 			DisplayText("%s\r\n", chat_msg->msg);
 			break;
 		case TYPE_SELECT:
+			if (roundNum >= maxRound) {
+				isGameOver = TRUE;
+				break;
+			}
 			strcpy(selectedName, comm_msg.dummy);
 			_TCHAR selectedName_T[BUFSIZE];
 			MultiByteToWideChar(CP_ACP, 0, selectedName, -1, selectedName_T, BUFSIZE);
