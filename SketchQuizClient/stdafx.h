@@ -142,36 +142,45 @@ static HWND			hwndHome_Pass;		// 공지사항 비밀번호 윈도우
 static HWND			hwndHome_Notice;	// 공지사항 입력 윈도우
 
 // ======= 정호 =========
-#define TYPE_DRAWELLIPSE	4000		// 메시지 타입 : 타원 그리기
-#define TYPE_DRAWRECTANGLE	4001		// 메시지 타입 : 사각형 그리기
-#define TYPE_DRAWTRIANGLE	4002		// 메시지 타입 : 삼각형 그리기
-#define TYPE_DRAWSTRAIGHT	4003		// 메시지 타입 : 직선 그리기
-#define TYPE_DRAWPENTAGON	4004		// 메시지 타입 : 오각형 그리기
-#define TYPE_DRAWSTAR		4005		// 메시지 타입 : 별 그리기
-#define TYPE_DRAWTRAPEZOID	4006		// 메시지 타입 : 사다리꼴 그리기
-#define TYPE_DRAWCHESTNUT	4007		// 메시지 타입 : 밤톨 그리기
+#define TYPE_DRAWELLIPSE			4000		// 메시지 타입 : 타원 그리기
+#define TYPE_DRAWRECTANGLE			4001		// 메시지 타입 : 사각형 그리기
+#define TYPE_DRAWTRIANGLE			4002		// 메시지 타입 : 삼각형 그리기
+#define TYPE_DRAWSTRAIGHT			4003		// 메시지 타입 : 직선 그리기
+#define TYPE_DRAWPENTAGON			4004		// 메시지 타입 : 오각형 그리기
+#define TYPE_DRAWSTAR				4005		// 메시지 타입 : 별 그리기
+#define TYPE_DRAWTRAPEZOID			4006		// 메시지 타입 : 사다리꼴 그리기
+#define TYPE_DRAWCHESTNUT			4007		// 메시지 타입 : 밤톨 그리기
+#define TYPE_DRAWPARALLELOGRAM		4008		// 메시지 타입 : 평행사변형 그리기
+#define TYPE_DRAWDIAMOND			4009		// 메시지 타입 : 마름모 그리기
+#define TYPE_DRAWARROW				4010		// 메시지 타입 : 화살표 그리기
 
-#define WM_DRAWELLIPSE		(WM_USER+3)		// 타원 그리기 윈도우 메시지
-#define WM_ERASEALITTLE		(WM_USER+4)		// 특정 부분 조금 지우기 윈도우 메시지
-#define WM_DRAWRECTANGLE	(WM_USER+5)		// 사각형 그리기 윈도우 메시지
-#define WM_DRAWTRIAGNGLE	(WM_USER+6)		// 삼각형 그리기 윈도우 메시지
-#define WM_DRAWSTRAIGHT		(WM_USER+7)		// 직선 그리기 윈도우 메시지
-#define WM_DRAWPENTAGON		(WM_USER+8)		// 오각형 그리기 윈도우 메시지
-#define WM_DRAWSTAR			(WM_USER+9)		// 별 그리기 윈도우 메시지
-#define WM_DRAWTRAPEZOID	(WM_USER+10)	// 사다리꼴 그리기 윈도우 메시지
-#define WM_DRAWCHESTNUT		(WM_USER+11)	// 밤톨 그리기 윈도우 메시지
+#define WM_DRAWELLIPSE			(WM_USER+3)		// 타원 그리기 윈도우 메시지
+#define WM_ERASEALITTLE			(WM_USER+4)		// 특정 부분 조금 지우기 윈도우 메시지
+#define WM_DRAWRECTANGLE		(WM_USER+5)		// 사각형 그리기 윈도우 메시지
+#define WM_DRAWTRIAGNGLE		(WM_USER+6)		// 삼각형 그리기 윈도우 메시지
+#define WM_DRAWSTRAIGHT			(WM_USER+7)		// 직선 그리기 윈도우 메시지
+#define WM_DRAWPENTAGON			(WM_USER+8)		// 오각형 그리기 윈도우 메시지
+#define WM_DRAWSTAR				(WM_USER+9)		// 별 그리기 윈도우 메시지
+#define WM_DRAWTRAPEZOID		(WM_USER+10)	// 사다리꼴 그리기 윈도우 메시지
+#define WM_DRAWCHESTNUT			(WM_USER+11)	// 밤톨 그리기 윈도우 메시지
+#define WM_DRAWPARALLELOGRAM	(WM_USER+12)	// 평행사변형 그리기 윈도우 메시지
+#define WM_DRAWDIAMOND			(WM_USER+13)	// 마름모 그리기 윈도우 메시지
+#define WM_DRAWARROW			(WM_USER+14)	// 화살표 그리기 윈도우 메시지
 
 // 그리기 모드 종류
-#define MODE_ERASE		4500
-#define MODE_LINE		4501
-#define MODE_ELLIPSE	4502
-#define MODE_RECTANGLE	4503
-#define MODE_TRIANGLE	4504
-#define MODE_STRAIGHT	4505
-#define MODE_PENTAGON	4506
-#define MODE_STAR		4507
-#define MODE_TRAPEZOID	4508
-#define MODE_CHESTNUT	4509
+#define MODE_ERASE			4500
+#define MODE_LINE			4501
+#define MODE_ELLIPSE		4502
+#define MODE_RECTANGLE		4503
+#define MODE_TRIANGLE		4504
+#define MODE_STRAIGHT		4505
+#define MODE_PENTAGON		4506
+#define MODE_STAR			4507
+#define MODE_TRAPEZOID		4508
+#define MODE_CHESTNUT		4509
+#define MODE_PARALLELOGRAM	4510
+#define MODE_DIAMOND		4511
+#define MODE_ARROW			4512
 
 // 현재 그리기 모드 전역 변수
 static int g_currentSelectFigureMode = MODE_LINE;
