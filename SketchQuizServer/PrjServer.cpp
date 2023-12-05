@@ -464,7 +464,6 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					strcpy(sendMsg.dummy, selectedName);
 					// 같은 그룹에만 데이터 전송
 					UDPINFO* clientUDP = UDPSocketInfoArray[i];
-					printf("send groupNumUDP : %d, clientUDP->GroupNum : %d\n", groupNumUDP, clientUDP->groupNum);
 					if (groupNumUDP == clientUDP->groupNum)
 					{
 						// 데이터 보내기
@@ -473,7 +472,7 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 							err_display("sendto()");
 							return;
 						}
-						printf("sendto retval : %d\n", retval);
+						printf("게임 : %d\n", retval);
 					}
 				}
 				break;

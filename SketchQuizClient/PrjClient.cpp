@@ -1411,7 +1411,7 @@ DWORD WINAPI ReadThread(LPVOID arg)
 			chat_msg = (CHAT_MSG*)&comm_msg;
 			DisplayText("%s\r\n", chat_msg->msg);
 			break;
-		case TYPE_SELECT:
+		case TYPE_SELECT: {
 			if (roundNum >= maxRound) {
 				isGameOver = TRUE;
 				break;
@@ -1420,7 +1420,17 @@ DWORD WINAPI ReadThread(LPVOID arg)
 			strcpy(selectedName, comm_msg.dummy);
 			_TCHAR selectedName_T[BUFSIZE];
 			MultiByteToWideChar(CP_ACP, 0, selectedName, -1, selectedName_T, BUFSIZE);
-			DisplayDrawingUserID(g_hDrawDlg, selectedName_T);
+			//DisplayDrawingUserID(g_hDrawDlg, selectedName_T);
+			HWND hStaticText = GetDlgItem(g_hDrawDlg, IDC_DRAWINGTEXTID);
+			if (hStaticText != NULL) {
+				SetWindowText(hStaticText, selectedName_T); // 텍스트 설정
+			////_TCHAR* drawingUserID = userIDs; // 랜덤 사용자 아이디를 가져옴
+			//if (drawingUserID != NULL) {
+			//}
+			//else {
+			//	SetWindowText(hStaticText, _T("로그인먼저!"));
+			//}
+			}
 			if (strcmp(selectedName, NICKNAME_CHAR) == 0) {  // 만약 현재 클라이언트가 선택되었다면
 				// char* 형 문자열을 _TCHAR 형 문자열로 변환
 				isOwner = TRUE; // 그림 그리는 사람(Owner)임을 TRUE 체크
@@ -1438,8 +1448,8 @@ DWORD WINAPI ReadThread(LPVOID arg)
 			//	err_display("setIDInSocket");
 			//}
 			break;
-		// =================================
-
+			// =================================
+		}
 		case TYPE_DRAWLINE:
 			drawline_msg = (DRAWLINE_MSG*)&comm_msg;
 			// ============ 지윤 ============
