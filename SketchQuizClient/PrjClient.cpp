@@ -1330,7 +1330,8 @@ DWORD WINAPI ReadThread(LPVOID arg)
 
 
 			//MessageBox(NULL, notice_msg_Tchar, _T("UDP 데이터를 받았어요."), MB_OK);
-			DisplayText("[ 공지 ] %s\r\n", notice_msg->msg);
+			//DisplayText("[ 공지 ] %s\r\n", notice_msg->msg);
+			SetDlgItemTextA(g_hDrawDlg, IDC_ANNOUNCE, notice_msg->msg);
 			break;
 		// ==================================== //
 			
