@@ -277,7 +277,7 @@ INT_PTR CALLBACK DlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		EnableWindow(hBtnGameStart, TRUE);
 		WaitForSingleObject(g_hReadEvent, INFINITE);
 		// 새로운 채팅 메시지를 얻고 쓰기 완료를 알림
-		g_chatmsg.type = TYPE_NOTY;
+		g_chatmsg.type = TYPE_ENTER;
 		sprintf(g_chatmsg.msg, "[%s] 님이 입장하였습니다!", NICKNAME_CHAR);
 		SetEvent(g_hWriteEvent);
 
@@ -1428,6 +1428,7 @@ DWORD WINAPI ReadThread(LPVOID arg)
 			}
 
 			break;
+		case TYPE_ENTER:
 		case TYPE_NOTY:
 			chat_msg = (CHAT_MSG*)&comm_msg;
 			DisplayText("%s\r\n", chat_msg->msg);
