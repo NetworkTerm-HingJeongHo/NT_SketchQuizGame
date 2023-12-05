@@ -597,6 +597,30 @@ LRESULT CALLBACK ChildWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 				sendn(g_sock, (char*)&g_drawpolygonmsg, SIZE_TOT, 0, serveraddr, g_isUDP);
 				break;
 
+			// "사다리꼴" 그리기 모드
+			case MODE_TRAPEZOID:
+				g_drawpolygonmsg.type = TYPE_DRAWTRAPEZOID;
+				g_drawpolygonmsg.startX = x0;
+				g_drawpolygonmsg.startY = y0;
+				g_drawpolygonmsg.endX = LOWORD(lParam);
+				g_drawpolygonmsg.endY = HIWORD(lParam);
+				g_drawpolygonmsg.color = g_clientDrawDetailInformation.color;
+				g_drawpolygonmsg.width = g_clientDrawDetailInformation.width;
+				sendn(g_sock, (char*)&g_drawpolygonmsg, SIZE_TOT, 0, serveraddr, g_isUDP);
+				break;
+
+			// "밤톨" 그리기 모드
+			case MODE_CHESTNUT:
+				g_drawpolygonmsg.type = TYPE_DRAWCHESTNUT;
+				g_drawpolygonmsg.startX = x0;
+				g_drawpolygonmsg.startY = y0;
+				g_drawpolygonmsg.endX = LOWORD(lParam);
+				g_drawpolygonmsg.endY = HIWORD(lParam);
+				g_drawpolygonmsg.color = g_clientDrawDetailInformation.color;
+				g_drawpolygonmsg.width = g_clientDrawDetailInformation.width;
+				sendn(g_sock, (char*)&g_drawpolygonmsg, SIZE_TOT, 0, serveraddr, g_isUDP);
+				break;
+
 			default:
 				break;
 			}
@@ -644,7 +668,17 @@ LRESULT CALLBACK ChildWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 	case WM_DRAWSTAR:
 		DrawPolygonProcess(hWnd, hDCMem, wParam, lParam, g_serverDrawDetailInformation, MODE_STAR);
 		return 0;
-		
+
+	// 사디리꼴 그리기 메시지 받음
+	case WM_DRAWTRAPEZOID:
+		DrawPolygonProcess(hWnd, hDCMem, wParam, lParam, g_serverDrawDetailInformation, MODE_TRAPEZOID);
+		return 0;
+
+	// 밤톨 그리기 메시지 받음
+	case WM_DRAWCHESTNUT:
+		DrawPolygonProcess(hWnd, hDCMem, wParam, lParam, g_serverDrawDetailInformation, MODE_CHESTNUT);
+		return 0;
+
 	//
 	case WM_ERASEPIC:
 		// 배경 비트맵 흰색으로 채움
@@ -1359,6 +1393,26 @@ DWORD WINAPI ReadThread(LPVOID arg)
 			g_serverDrawDetailInformation.width = drawPolygon_msg->width;
 			g_serverDrawDetailInformation.color = drawPolygon_msg->color;
 			SendMessage(g_hDrawWnd, WM_DRAWSTAR,
+				MAKEWPARAM(drawPolygon_msg->startX, drawPolygon_msg->startY),
+				MAKELPARAM(drawPolygon_msg->endX, drawPolygon_msg->endY));
+			break;
+
+		// 사다리꼴 그리기
+		case TYPE_DRAWTRAPEZOID:
+			drawPolygon_msg = (DRAWPOLYGON_MSG*)&comm_msg;
+			g_serverDrawDetailInformation.width = drawPolygon_msg->width;
+			g_serverDrawDetailInformation.color = drawPolygon_msg->color;
+			SendMessage(g_hDrawWnd, WM_DRAWTRAPEZOID,
+				MAKEWPARAM(drawPolygon_msg->startX, drawPolygon_msg->startY),
+				MAKELPARAM(drawPolygon_msg->endX, drawPolygon_msg->endY));
+			break;
+
+		// 밤톨 그리기
+		case TYPE_DRAWCHESTNUT:
+			drawPolygon_msg = (DRAWPOLYGON_MSG*)&comm_msg;
+			g_serverDrawDetailInformation.width = drawPolygon_msg->width;
+			g_serverDrawDetailInformation.color = drawPolygon_msg->color;
+			SendMessage(g_hDrawWnd, WM_DRAWCHESTNUT,
 				MAKEWPARAM(drawPolygon_msg->startX, drawPolygon_msg->startY),
 				MAKELPARAM(drawPolygon_msg->endX, drawPolygon_msg->endY));
 			break;

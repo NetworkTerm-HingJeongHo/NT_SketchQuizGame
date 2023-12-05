@@ -95,4 +95,10 @@ void DrawPentagonInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam);
 void DrawStarInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam);
 
 // 포인트 개수에 따라 일정 각도별 위치들 반환
-void GetPositionByPoints(int**& positions, int points, int centerX, int centerY, int radius);
+void GetPositionByPoints(int**& positions, int points, int centerX, int centerY, int radius, int revision);
+
+// 사다리꼴을 특정 HDC에 그림
+void DrawTrapezoidInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam);
+
+// 밤톨을 특정 HDC에 그림
+void DrawChestnutInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam);
