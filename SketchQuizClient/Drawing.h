@@ -52,7 +52,7 @@ void AddLineWidthOption(HWND hDlg);
 void SelectLineWidth(HWND hDlg, DRAW_DETAIL_INFORMATION* g_drawDetailInformation);
 void AddUser(_TCHAR* userIDs[], _TCHAR* newUserID);
 _TCHAR* SetRandomUserID(_TCHAR* userIDs[]);
-void DisplayDrawingUserID(HWND hDlg, _TCHAR* userIDs[]);
+void DisplayDrawingUserID(HWND hDlg, _TCHAR* userIDs);
 
 
 // ======================= Á¤È£ =======================
