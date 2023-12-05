@@ -142,32 +142,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_CREATE:
 		/* 클라이언트 목록 */
 		InitializeListView(hWnd);
-		CreateWindow(_T("BUTTON"), _T("사용자 강제퇴장"), WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
-			10, 220, 200, 30, hWnd, (HMENU)CLIENTOUT, NULL, NULL);
 		/* 채팅 데이터 */
 		InitializeChatListView(hWnd);
-		return 0;
-	case WM_COMMAND:
-		switch (LOWORD(wParam))
-		{
-		case CLIENTOUT:
-			if (g_selectedIndex != -1) {
-				// 선택한 클라이언트를 제거하는 코드 추가
-				RemoveClientFromListViewAndSock(g_selectedIndex);
-
-				// 선택을 해제하고 g_selectedIndex를 초기화
-				ListView_SetItemState(g_hListView, g_selectedIndex, 0, LVIS_SELECTED);
-				g_selectedIndex = -1;
-			}
-			break;
-		}
-		return 0;
-	case WM_NOTIFY:
-		if (((LPNMHDR)lParam)->code == NM_CLICK) {
-			// ListView에서 클릭 이벤트를 처리하여 선택한 클라이언트의 인덱스를 저장
-			NMITEMACTIVATE* pnmia = (NMITEMACTIVATE*)lParam;
-			g_selectedIndex = pnmia->iItem;
-		}
 		return 0;
 		// ============ 정호 ============
 	case WM_SOCKET: // 소켓 관련 윈도우 메시지
@@ -460,7 +436,6 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		break;
 	case FD_CLOSE:
 		RemoveSocketInfo(wParam);
-
 		break;
 	}
 }
