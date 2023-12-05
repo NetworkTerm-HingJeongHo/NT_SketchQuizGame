@@ -17,6 +17,7 @@ int recvn(SOCKET s, char* buf, int len, int flags, SOCKADDR_IN serveraddr, bool 
 		{
 			int serveraddrLen = sizeof(serveraddr);
 			received = recvfrom(s, ptr, left, flags, (SOCKADDR*)&serveraddr, &serveraddrLen);
+
 		}
 		// TCP 통신으로 데이터 받기
 		else
@@ -45,13 +46,12 @@ int sendn(SOCKET s, char* buf, int len, int flags, SOCKADDR_IN serveraddr, bool 
 	int received;
 	char* ptr = buf;
 	int left = len;
-
 	while (left > 0) 
 	{
 		// UDP 통신으로 데이터 보내기
 		if (bIsUDP)
 		{
-			received = sendto(s, ptr, left, flags, (SOCKADDR*)&serveraddr, sizeof(serveraddr));
+			received = sendto(s, buf, left, flags, (SOCKADDR*)&serveraddr, sizeof(serveraddr));
 		}
 		// TCP 통신으로 데이터 받기
 		else
