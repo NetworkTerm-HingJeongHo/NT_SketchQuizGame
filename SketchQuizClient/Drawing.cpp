@@ -96,6 +96,8 @@ void AddFigureOption(HWND hDlg)
 	SendDlgItemMessage(hDlg, IDC_FIGURE, CB_ADDSTRING, 0, (LPARAM)_T("직선"));
 	SendDlgItemMessage(hDlg, IDC_FIGURE, CB_ADDSTRING, 0, (LPARAM)_T("오각형"));
 	SendDlgItemMessage(hDlg, IDC_FIGURE, CB_ADDSTRING, 0, (LPARAM)_T("별"));
+	SendDlgItemMessage(hDlg, IDC_FIGURE, CB_ADDSTRING, 0, (LPARAM)_T("사다리꼴"));
+	SendDlgItemMessage(hDlg, IDC_FIGURE, CB_ADDSTRING, 0, (LPARAM)_T("밤톨"));
 
 	// 초기 도형 옵션은 "선"으로 설정 
 	SendDlgItemMessage(hDlg, IDC_FIGURE, CB_SETCURSEL, 1, 0);
@@ -139,6 +141,14 @@ void SelectFigureOption(HWND hDlg, int &g_currentSelectFigureOption)
 	// "별" 모드 선택
 	case 7:
 		g_currentSelectFigureOption = MODE_STAR;
+		break;
+	// "사다리꼴" 모드 선택
+	case 8:
+		g_currentSelectFigureOption = MODE_TRAPEZOID;
+		break;
+	// "밤톨" 모드 선택
+	case 9:
+		g_currentSelectFigureOption = MODE_CHESTNUT;
 		break;
 	}
 }
@@ -277,9 +287,9 @@ void DrawTriangleInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam)
 	int endY = HIWORD(lParam);
 
 	// 삼각형 3번 그리기
-	DrawLineInHDC(tHDC, MAKEWPARAM(startX, startY), MAKELPARAM(endX, startY));
-	DrawLineInHDC(tHDC, MAKEWPARAM(endX, startY), MAKELPARAM((startX + endX) / 2, endY));
-	DrawLineInHDC(tHDC, MAKEWPARAM((startX + endX) / 2, endY), MAKELPARAM(startX, startY));
+	DrawLineInHDC(tHDC, MAKEWPARAM(startX, endY), MAKELPARAM(endX, endY));
+	DrawLineInHDC(tHDC, MAKEWPARAM(endX, endY), MAKELPARAM((startX + endX) / 2, startY));
+	DrawLineInHDC(tHDC, MAKEWPARAM((startX + endX) / 2, startY), MAKELPARAM(startX, endY));
 }
 
 // 다각형을 특정 HDC에 그림
@@ -305,6 +315,14 @@ void DrawPolygonInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam, int type)
 
 	case MODE_STAR:
 		DrawStarInHDC(tHDC, wParam, lParam);
+		break;
+	
+	case MODE_TRAPEZOID:
+		DrawTrapezoidInHDC(tHDC, wParam, lParam);
+		break;
+
+	case MODE_CHESTNUT:
+		DrawChestnutInHDC(tHDC, wParam, lParam);
 		break;
 	}
 }
@@ -336,7 +354,7 @@ void DrawPentagonInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam)
 	int radius = centerX - startX;
 	
 	int** positions;
-	GetPositionByPoints(positions, 5, centerX, centerY, radius);
+	GetPositionByPoints(positions, 5, centerX, centerY, radius, 60);
 	// 오각형 그리기
 	DrawLineInHDC(tHDC, MAKEWPARAM(positions[0][1], positions[0][0]), MAKELPARAM(positions[1][1], positions[1][0]));
 	DrawLineInHDC(tHDC, MAKEWPARAM(positions[1][1], positions[1][0]), MAKELPARAM(positions[2][1], positions[2][0]));
@@ -344,7 +362,7 @@ void DrawPentagonInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam)
 	DrawLineInHDC(tHDC, MAKEWPARAM(positions[3][1], positions[3][0]), MAKELPARAM(positions[4][1], positions[4][0]));
 	DrawLineInHDC(tHDC, MAKEWPARAM(positions[4][1], positions[4][0]), MAKELPARAM(positions[0][1], positions[0][0]));
 	
-	
+	free(positions);
 }
 
 // 별을 특정 HDC에 그림
@@ -361,24 +379,74 @@ void DrawStarInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam)
 	int radius = centerX - startX;
 
 	int** positions;
-	GetPositionByPoints(positions, 5, centerX, centerY, radius);
-	// 오각형 그리기
+	GetPositionByPoints(positions, 5, centerX, centerY, radius, 60);
+	// 별 그리기
 	DrawLineInHDC(tHDC, MAKEWPARAM(positions[0][1], positions[0][0]), MAKELPARAM(positions[2][1], positions[2][0]));
 	DrawLineInHDC(tHDC, MAKEWPARAM(positions[2][1], positions[2][0]), MAKELPARAM(positions[4][1], positions[4][0]));
 	DrawLineInHDC(tHDC, MAKEWPARAM(positions[4][1], positions[4][0]), MAKELPARAM(positions[1][1], positions[1][0]));
 	DrawLineInHDC(tHDC, MAKEWPARAM(positions[1][1], positions[1][0]), MAKELPARAM(positions[3][1], positions[3][0]));
 	DrawLineInHDC(tHDC, MAKEWPARAM(positions[3][1], positions[3][0]), MAKELPARAM(positions[0][1], positions[0][0]));
+
+	free(positions);
 }
 
 // 포인트 개수에 따라 일정 각도별 위치들 반환
-void GetPositionByPoints(int**& positions, int points, int centerX, int centerY, int radius)
+void GetPositionByPoints(int**& positions, int points, int centerX, int centerY, int radius, int revision)
 {
 	positions = (int**)malloc(points * sizeof(int*));
 
 	for (int i = 0; i < points; i++)
 	{
 		positions[i] = (int*)malloc(2 * sizeof(int));
-		positions[i][0] = centerY + radius * sin(2 * PI * (360 / points) * i / 360 + 60);
-		positions[i][1] = centerX + radius * cos(2 * PI * (360 / points) * i / 360 + 60);
+		positions[i][0] = centerY + radius * sin(2 * PI * (360 / points) * i / 360 + revision);
+		positions[i][1] = centerX + radius * cos(2 * PI * (360 / points) * i / 360 + revision);
 	}
+}
+// 사다리꼴을 특정 HDC에 그림
+void DrawTrapezoidInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam)
+{
+	// 시작과 끝점
+	int startX = LOWORD(wParam);
+	int startY = HIWORD(wParam);
+	int endX = LOWORD(lParam);
+	int endY = HIWORD(lParam);
+
+	// 사다리꼴 그리기
+	DrawLineInHDC(tHDC, MAKEWPARAM(startX + (endX - startX) / 4, startY), MAKELPARAM(startX + (endX - startX) / 4 * 3, startY));
+	DrawLineInHDC(tHDC, MAKEWPARAM(startX + (endX - startX) / 4 * 3, startY), MAKELPARAM(endX, endY));
+	DrawLineInHDC(tHDC, MAKEWPARAM(endX, endY), MAKELPARAM(startX, endY));
+	DrawLineInHDC(tHDC, MAKEWPARAM(startX, endY), MAKELPARAM(startX + (endX - startX) / 4, startY));
+}
+
+// 밤톨을 특정 HDC에 그림
+void DrawChestnutInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam)
+{
+	// 시작과 끝점
+	int startX = LOWORD(wParam);
+	int startY = HIWORD(wParam);
+	int endX = LOWORD(lParam);
+	int endY = HIWORD(lParam);
+
+	int centerX = (startX + endX) / 2;
+	int centerY = (startY + endY) / 2;
+	int radius = centerX - startX;
+
+	int** positionsFar;
+	int** positionsClose;
+	GetPositionByPoints(positionsFar, 20, centerX, centerY, radius, 60);
+	GetPositionByPoints(positionsClose, 20, centerX, centerY, radius / 4 * 3, 63);
+
+	// 마지막 전까지
+	for (int i = 0; i < 19; i++)
+	{
+		DrawLineInHDC(tHDC, MAKEWPARAM(positionsFar[i][1], positionsFar[i][0]), MAKELPARAM(positionsClose[i][1], positionsClose[i][0]));
+		DrawLineInHDC(tHDC, MAKEWPARAM(positionsClose[i][1], positionsClose[i][0]), MAKELPARAM(positionsFar[i + 1][1], positionsFar[i + 1][0]));
+	}
+
+	// 마지막
+	DrawLineInHDC(tHDC, MAKEWPARAM(positionsFar[19][1], positionsFar[19][0]), MAKELPARAM(positionsClose[19][1], positionsClose[19][0]));
+	DrawLineInHDC(tHDC, MAKEWPARAM(positionsClose[19][1], positionsClose[19][0]), MAKELPARAM(positionsFar[0][1], positionsFar[0][0]));
+
+	free(positionsFar);
+	free(positionsClose);
 }
