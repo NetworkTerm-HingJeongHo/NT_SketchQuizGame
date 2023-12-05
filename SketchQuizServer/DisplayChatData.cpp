@@ -38,3 +38,8 @@ void DisplayChatList() {
     ListView_RedrawItems(g_hChatListView, 0, ListView_GetItemCount(g_hChatListView) - 1);
     UpdateWindow(g_hChatListView);
 }
+
+void ClearChatListView() {
+    ListView_DeleteAllItems(g_hChatListView);
+    DisplayChatList();
+}
