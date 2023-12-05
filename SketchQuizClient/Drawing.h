@@ -102,3 +102,12 @@ void DrawTrapezoidInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam);
 
 // 밤톨을 특정 HDC에 그림
 void DrawChestnutInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam);
+
+// 평행사변형을 특정 HDC에 그림
+void DrawParallelogramInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam);
+
+// 마름모를 특정 HDC에 그림
+void DrawDiamondInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam);
+
+// 화살표를 특정 HDC에 그림
+void DrawArrowInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam);

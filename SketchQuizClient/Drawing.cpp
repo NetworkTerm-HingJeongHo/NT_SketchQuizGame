@@ -98,6 +98,9 @@ void AddFigureOption(HWND hDlg)
 	SendDlgItemMessage(hDlg, IDC_FIGURE, CB_ADDSTRING, 0, (LPARAM)_T("별"));
 	SendDlgItemMessage(hDlg, IDC_FIGURE, CB_ADDSTRING, 0, (LPARAM)_T("사다리꼴"));
 	SendDlgItemMessage(hDlg, IDC_FIGURE, CB_ADDSTRING, 0, (LPARAM)_T("밤톨"));
+	SendDlgItemMessage(hDlg, IDC_FIGURE, CB_ADDSTRING, 0, (LPARAM)_T("평행사변형"));
+	SendDlgItemMessage(hDlg, IDC_FIGURE, CB_ADDSTRING, 0, (LPARAM)_T("마름모"));
+	SendDlgItemMessage(hDlg, IDC_FIGURE, CB_ADDSTRING, 0, (LPARAM)_T("화살표"));
 
 	// 초기 도형 옵션은 "선"으로 설정 
 	SendDlgItemMessage(hDlg, IDC_FIGURE, CB_SETCURSEL, 1, 0);
@@ -149,6 +152,18 @@ void SelectFigureOption(HWND hDlg, int &g_currentSelectFigureOption)
 	// "밤톨" 모드 선택
 	case 9:
 		g_currentSelectFigureOption = MODE_CHESTNUT;
+		break;
+	// "평행사변형" 모드 선택
+	case 10:
+		g_currentSelectFigureOption = MODE_PARALLELOGRAM;
+		break;
+	// "마름모" 모드 선택
+	case 11:
+		g_currentSelectFigureOption = MODE_DIAMOND;
+		break;
+	// "화살표" 모드 선택
+	case 12:
+		g_currentSelectFigureOption = MODE_ARROW;
 		break;
 	}
 }
@@ -324,6 +339,18 @@ void DrawPolygonInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam, int type)
 	case MODE_CHESTNUT:
 		DrawChestnutInHDC(tHDC, wParam, lParam);
 		break;
+
+	case MODE_PARALLELOGRAM:
+		DrawParallelogramInHDC(tHDC, wParam, lParam);
+		break;
+
+	case MODE_DIAMOND:
+		DrawDiamondInHDC(tHDC, wParam, lParam);
+		break;
+
+	case MODE_ARROW:
+		DrawArrowInHDC(tHDC, wParam, lParam);
+		break;
 	}
 }
 
@@ -434,7 +461,7 @@ void DrawChestnutInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam)
 	int** positionsFar;
 	int** positionsClose;
 	GetPositionByPoints(positionsFar, 20, centerX, centerY, radius, 60);
-	GetPositionByPoints(positionsClose, 20, centerX, centerY, radius / 4 * 3, 63);
+	GetPositionByPoints(positionsClose, 20, centerX, centerY, radius / 4 * 3, 57);
 
 	// 마지막 전까지
 	for (int i = 0; i < 19; i++)
@@ -449,4 +476,61 @@ void DrawChestnutInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam)
 
 	free(positionsFar);
 	free(positionsClose);
+}
+
+// 평행사변형을 특정 HDC에 그림
+void DrawParallelogramInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam)
+{
+	// 시작과 끝점
+	int startX = LOWORD(wParam);
+	int startY = HIWORD(wParam);
+	int endX = LOWORD(lParam);
+	int endY = HIWORD(lParam);
+
+	// 평행사변형 그리기
+	DrawLineInHDC(tHDC, MAKEWPARAM(startX + (endX - startX) / 4, startY), MAKELPARAM(endX, startY));
+	DrawLineInHDC(tHDC, MAKEWPARAM(endX, startY), MAKELPARAM(startX + (endX - startX) / 4 * 3, endY));
+	DrawLineInHDC(tHDC, MAKEWPARAM(startX + (endX - startX) / 4 * 3, endY), MAKELPARAM(startX, endY));
+	DrawLineInHDC(tHDC, MAKEWPARAM(startX, endY), MAKELPARAM(startX + (endX - startX) / 4, startY));
+}
+
+// 마름모를 특정 HDC에 그림
+void DrawDiamondInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam)
+{
+	// 시작과 끝점
+	int startX = LOWORD(wParam);
+	int startY = HIWORD(wParam);
+	int endX = LOWORD(lParam);
+	int endY = HIWORD(lParam);
+
+	int centerX = (startX + endX) / 2;
+	int centerY = (startY + endY) / 2;
+
+	// 마름모 그리기
+	DrawLineInHDC(tHDC, MAKEWPARAM(centerX, startY), MAKELPARAM(endX, centerY));
+	DrawLineInHDC(tHDC, MAKEWPARAM(endX, centerY), MAKELPARAM(centerX, endY));
+	DrawLineInHDC(tHDC, MAKEWPARAM(centerX, endY), MAKELPARAM(startX, centerY));
+	DrawLineInHDC(tHDC, MAKEWPARAM(startX, centerY), MAKELPARAM(centerX, startY));
+}
+
+// 화살표를 특정 HDC에 그림
+void DrawArrowInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam)
+{
+	// 시작과 끝점
+	int startX = LOWORD(wParam);
+	int startY = HIWORD(wParam);
+	int endX = LOWORD(lParam);
+	int endY = HIWORD(lParam);
+
+	int centerX = (startX + endX) / 2;
+	int centerY = (startY + endY) / 2;
+
+	// 화살표 그리기
+	DrawLineInHDC(tHDC, MAKEWPARAM(startX, startY + (endY - startY) / 4), MAKELPARAM(startX + (endX - startX) / 4 * 3, startY + (endY - startY) / 4));
+	DrawLineInHDC(tHDC, MAKEWPARAM(startX + (endX - startX) / 4 * 3, startY + (endY - startY) / 4), MAKELPARAM(startX + (endX - startX) / 4 * 3, startY));
+	DrawLineInHDC(tHDC, MAKEWPARAM(startX + (endX - startX) / 4 * 3, startY), MAKELPARAM(endX, centerY));
+	DrawLineInHDC(tHDC, MAKEWPARAM(endX, centerY), MAKELPARAM(startX + (endX - startX) / 4 * 3, endY));
+	DrawLineInHDC(tHDC, MAKEWPARAM(startX + (endX - startX) / 4 * 3, endY), MAKELPARAM(startX + (endX - startX) / 4 * 3, startY + (endY - startY) / 4 * 3));
+	DrawLineInHDC(tHDC, MAKEWPARAM(startX + (endX - startX) / 4 * 3, startY + (endY - startY) / 4 * 3), MAKELPARAM(startX, startY + (endY - startY) / 4 * 3));
+	DrawLineInHDC(tHDC, MAKEWPARAM(startX, startY + (endY - startY) / 4 * 3), MAKELPARAM(startX, startY + (endY - startY) / 4));
 }
