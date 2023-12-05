@@ -436,6 +436,7 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					fd = fopen("chatting_log_1.txt", "a+");
 				else
 					fd = fopen("chatting_log_2.txt", "a+");
+
 				char n = '\n';
 				fwrite(msg, sizeof(char), strlen(msg), fd);
 				fwrite(&n, sizeof(char), sizeof(n), fd);

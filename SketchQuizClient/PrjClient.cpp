@@ -250,15 +250,15 @@ INT_PTR CALLBACK DlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		ShowWindow(g_hDrawWnd, SW_SHOW);
 		UpdateWindow(g_hDrawWnd);
+		// 컨트롤 상태 변경
+		EnableWindow(g_hBtnSendFile, TRUE);
+		EnableWindow(g_hBtnSendMsg, TRUE);
+		SetFocus(hEditMsg);
+		EnableWindow(g_hBtnErasePic, TRUE);
 		return TRUE;
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDC_GAMESTART:
-			// 컨트롤 상태 변경
-			EnableWindow(g_hBtnSendFile, TRUE);
-			EnableWindow(g_hBtnSendMsg, TRUE);
-			SetFocus(hEditMsg);
-			EnableWindow(g_hBtnErasePic, TRUE);
 
 			// ========= 연경 =========
 
@@ -1379,10 +1379,10 @@ DWORD WINAPI ReadThread(LPVOID arg)
 				if (strcmp(reciever, NICKNAME_CHAR) == 0) {
 					MySendFile(senderName, reciever, chat_msg->msg);
 					DisplayText("%s\r\n", chat_msg->msg);
-					DisplayText("[%s]님으로부터 쪽지를 받았습니다!", senderName);
+					DisplayText("[%s]님으로부터 쪽지를 받았습니다!\r\n", senderName);
 				}
 				if (strcmp(senderName, NICKNAME_CHAR) == 0) {
-					DisplayText("[%s]님에게 쪽지를 보냈습니다!", reciever);
+					DisplayText("[%s]님에게 쪽지를 보냈습니다!\r\n", reciever);
 				}
 			}
 			else {
@@ -1428,14 +1428,10 @@ DWORD WINAPI ReadThread(LPVOID arg)
 				WideCharToMultiByte(CP_ACP, 0, quizWord[roundNum], 10, roundText, 10, NULL, NULL);
 				SetDlgItemTextA(g_hDrawDlg, IDC_EDIT_WORD, roundText);
 
-				ShowWindow(g_hDrawWnd, SW_SHOW);
-				UpdateWindow(g_hDrawWnd);
 			}
 			else {
 				isOwner = FALSE;
 				SetDlgItemTextA(g_hDrawDlg, IDC_EDIT_WORD, "-");
-				ShowWindow(g_hDrawWnd, SW_HIDE);
-				UpdateWindow(g_hDrawWnd);
 			}
 			//if (_tcscpy(ptr->id_nickname, selectedName_T) == NULL) {
 			//	// Handle the error
