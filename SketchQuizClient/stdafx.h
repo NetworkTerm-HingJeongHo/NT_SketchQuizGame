@@ -50,6 +50,7 @@ static HWND			 g_hBtnPenColor;  // [색상 변경] 버튼
 static HWND			 g_hLineWidth;    // 선 굵기 콤보박스
 static HWND			 g_hDrawingTextId;   // 그림 그리는 사람 아이디
 static HWND			 g_hDrawingText;     // 그림 그리는 사람 안내 문구
+static BOOL			 g_isLogin;		  // 로그인 여부
 
 // ============= 연경 =============
 // 채팅 관련 변수

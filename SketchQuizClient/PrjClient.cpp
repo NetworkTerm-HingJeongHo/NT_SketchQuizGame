@@ -84,6 +84,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	{
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
+
+		// ================ 지윤 ================
+		// 클라이언트 소켓이 닫혔을 때 프로그램 종료
+		if (((WSAGETSELECTEVENT(msg.lParam) == FD_CLOSE)) && g_isLogin == TRUE){
+			PostQuitMessage(0);
+		}
 	}
 
 	// 이벤트 객체 제거
@@ -773,6 +779,7 @@ LRESULT CALLBACK LoginWndProc(HWND hwndLogin, UINT msg, WPARAM wParam, LPARAM lP
 
 			// ==================== 지윤 ====================
 			AddUser(userIDs, input_result);
+			g_isLogin = TRUE;
 			// ==============================================
 
 			CreateAndShowWindow_Home(hwndHome); // 메인 생성 및 보이게하기
