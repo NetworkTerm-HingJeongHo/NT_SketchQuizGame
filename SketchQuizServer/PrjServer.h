@@ -13,6 +13,7 @@
 #define TYPE_ENTER    5001              // 메시지 타입: 입장했을 경우->서버가 이를 알고 이전채팅내용전송
 #define TYPE_NOTY     5002  // 입장, 퇴장, 새 라운드 알림 메시
 #define TYPE_START    5003
+#define TYPE_SELECT   5004
 // =============
 
 //==== 지안 ===== //
@@ -36,6 +37,8 @@ typedef struct _UDPINFO
 {
 	SOCKADDR_IN addr;
 	int groupNum = 0;
+	// ==== 연경 ====
+	char id_nickname[BUFSIZE];
 } UDPINFO;
 
 // 소켓 정보 저장을 위한 구조체와 변수
@@ -111,7 +114,7 @@ INT_PTR CALLBACK DialogProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 // 소켓 정보 관리 함수
 bool AddSocketInfoTCP(SOCKET sock);
-bool AddSocketInfoUDP(SOCKADDR_IN addr, int groupNum);
+bool AddSocketInfoUDP(SOCKADDR_IN addr, int groupNum, char* id_nickname);
 void RemoveSocketInfo(SOCKET sock);
 void addMessage(char* message);
 SOCKETINFO* GetSocketInfo(SOCKET sock);
