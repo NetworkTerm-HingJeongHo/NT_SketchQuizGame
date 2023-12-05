@@ -18,7 +18,6 @@
 #define IDC_LINEWIDTH                   3101
 #define IDC_DRAWINGTEXTID               3102
 #define IDC_DRAWINGTEXT                 3103
-#define IDC_EXIT_BUTTON                 3104
 #define IDC_FIGURE                      4100
 #define IDC_ANNOUNCE                    5010
 #define IDC_EDIT1ST                     5102

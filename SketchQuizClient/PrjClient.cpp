@@ -379,18 +379,6 @@ INT_PTR CALLBACK DlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			SelectLineWidth(hDlg, &g_clientDrawDetailInformation);
 			return TRUE;
 
-		case IDC_EXIT_BUTTON:
-			// 이전에 얻은 채팅 메시지 읽기 완료를 기다림
-			WaitForSingleObject(g_hReadEvent, INFINITE);
-			// 새로운 채팅 메시지를 얻고 쓰기 완료를 알림
-			snprintf(g_chatmsg.msg, sizeof(g_chatmsg), "[%s]님이 퇴장하였습니다.", NICKNAME_CHAR);
-			SetEvent(g_hWriteEvent);
-
-			closesocket(g_sock);
-			EndDialog(hDlg, 0);
-
-			//CreateRankDlg(hDlg);
-			return TRUE;
 		// ========= 정호 ===========
 		case IDC_FIGURE:
 			SelectFigureOption(hDlg, g_currentSelectFigureMode);

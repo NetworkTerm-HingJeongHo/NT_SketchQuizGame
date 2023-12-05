@@ -23,7 +23,12 @@ void InitializeListView(HWND hWnd) {
     ListView_SetExtendedListViewStyle(g_hListView, LVS_EX_FULLROWSELECT);
 }
 
-void AddClientToListView(int port, _TCHAR* id) {
+// 클라이언트 목록 인덱스와 해당 소켓 저장
+void AddClientSocketAndIndex(int index, SOCKET sock) {
+    tmp_ClientSock[index] = sock;
+}
+
+void AddClientToListView(int port, _TCHAR* id, SOCKET sock) {
     LVITEM lvItem = { 0 };
     lvItem.mask = LVIF_TEXT | LVIF_PARAM;
     lvItem.iItem = 0;
@@ -39,6 +44,10 @@ void AddClientToListView(int port, _TCHAR* id) {
 
     // 두 번째 열에 ID 추가
     ListView_SetItemText(g_hListView, index, 1, id);
+
+    // 클라이언트 목록 인덱스와 해당 소켓 저장
+    AddClientSocketAndIndex(index, sock);
+
     DisplayClientList();
 }
 
@@ -66,31 +75,6 @@ void RemoveClientFromListView(int port) {
     DisplayClientList();
 }
 
-// 포트 번호에 해당하는 소켓을 찾아서 제거하는 함수
-void RemoveSocketByPort(int portToRemove)
-{
-    SOCKET socketToRemove = INVALID_SOCKET;
-
-    // 소켓 배열을 반복하여 포트 번호에 해당하는 소켓을 찾음
-    for (int i = 0; i < nTotalSockets; i++)
-    {
-        SOCKETINFO* ptr = SocketInfoArray[i];
-        // 해당 소켓의 포트 번호를 가져와서 비교
-        struct sockaddr_in clientaddr;
-        int addrlen = sizeof(clientaddr);
-        getpeername(ptr->sock, (struct sockaddr*)&clientaddr, &addrlen);
-        int port = ntohs(clientaddr.sin_port);
-
-        if (port == portToRemove)
-        {
-            socketToRemove = ptr->sock;
-            break;
-        }
-    }
-
-    if (socketToRemove != INVALID_SOCKET)
-    {
-        // 찾은 소켓을 제거
-        RemoveSocketInfo(socketToRemove);
-    }
+void RemoveClientFromListViewAndSock(int index) {
+    RemoveSocketInfo(tmp_ClientSock[index]);
 }
