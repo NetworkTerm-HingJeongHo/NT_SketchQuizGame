@@ -4,5 +4,6 @@
 static HWND g_hChatListView;
 
 void InitializeChatListView(HWND hWnd);
-void AddChatMessageToListView(_TCHAR* message);
+void AddChatMessageToListView(char* message);
 void DisplayChatList();
+void ClearChatListView();

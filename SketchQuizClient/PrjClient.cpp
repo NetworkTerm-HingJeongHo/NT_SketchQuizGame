@@ -11,9 +11,6 @@ int channel;	//udp 채널 가져오기. stdafx.h 파일에 같은 주소에 저장하기 위함
 
 //-------------------------------//
 
-// ================ ji yoon ================
-static BOOL			 g_isLogin = FALSE;		  // 로그인 여부
-
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
 	// 윈속 초기화
@@ -71,14 +68,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	RegisterClass(&wcHome_Pass);
 
 	//------------------//
-	
-	// 메인 윈도우(첫 화면) 생성
-	WNDCLASSEX wcex = { sizeof(WNDCLASSEX), CS_HREDRAW | CS_VREDRAW, MainWndProc, 0, 0, GetModuleHandle(NULL), NULL, NULL, NULL, NULL, _T("MainWindow"), NULL };
-	RegisterClassEx(&wcex);
-	g_hMainWindow = CreateWindow(_T("MainWindow"), _T("Main Window"), WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 500, 200, NULL, NULL, hInstance, NULL);
-
-	ShowWindow(g_hMainWindow, nCmdShow);
-	UpdateWindow(g_hMainWindow);
+		// 로그인 창 생성
+	hwndLogin = CreateWindow(_T("LoginWindowClass"), _T("로그인 창"), WS_OVERLAPPEDWINDOW,
+		CW_USEDEFAULT, CW_USEDEFAULT, 1280, 720, NULL, NULL, g_hInstance, NULL);
+	ShowWindow(hwndLogin, SW_SHOW);
+	UpdateWindow(hwndLogin);
 
 
 	// 메시지 루프
@@ -87,12 +81,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	{
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
-
-		// ================ 지윤 ================
-		// 클라이언트 소켓이 닫혔을 때 프로그램 종료
-		//if (((WSAGETSELECTEVENT(msg.lParam) == FD_CLOSE)) && g_isLogin == TRUE){
-		//	PostQuitMessage(0);
-		//}
 	}
 
 	// 이벤트 객체 제거
@@ -100,53 +88,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	CloseHandle(g_hWriteEvent);
 	// 윈속 종료
 	WSACleanup();
-	return 0;
-}
-
-// 메인 윈도우 프로시저
-LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	switch (message)
-	{
-	case WM_CREATE:
-	{
-		// '그림판' 버튼 생성
-		CreateWindow(_T("BUTTON"), _T("그림판"), WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON, 10, 10, 100, 30, hWnd, (HMENU)1, g_hInstance, NULL);
-
-		// '로그인' 버튼 생성
-		CreateWindow(_T("BUTTON"), _T("로그인"), WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON, 120, 10, 100, 30, hWnd, (HMENU)2, g_hInstance, NULL);
-
-		// '랭킹' 버튼 생성 (세 번째로 위치)
-		CreateWindow(_T("BUTTON"), _T("랭킹"), WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON, 230, 10, 100, 30, hWnd, (HMENU)4, g_hInstance, NULL);
-
-		// '메인' 버튼 생성 (네 번째로 위치)
-		CreateWindow(_T("BUTTON"), _T("메인"), WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON, 340, 10, 100, 30, hWnd, (HMENU)3, g_hInstance, NULL);
-		break;
-	}
-	case WM_COMMAND:
-	{
-		if (LOWORD(wParam) == 1) // '그림판' 버튼 클릭
-		{
-			CreateAndShowDialog(hWnd);
-		}
-		//---지안 ----//
-		else if (LOWORD(wParam) == 2) // '로그인' 버튼 클릭
-		{
-			CreateAndShowWindow_Login(hwndLogin);
-		}
-		else if (LOWORD(wParam) == 3) // '메인' 버튼 클릭
-		{
-			CreateAndShowWindow_Home(hwndHome); // 메인 생성
-		}
-		//-----------//
-		break;
-	}
-	case WM_DESTROY:
-		PostQuitMessage(0);
-		break;
-	default:
-		return DefWindowProc(hWnd, message, wParam, lParam);
-	}
 	return 0;
 }
 
@@ -206,7 +147,7 @@ INT_PTR CALLBACK DlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		g_hTimerStatus = GetDlgItem(hDlg, IDC_EDIT_TIMER);  // 타이머 표시하는 EditText 부분 
 		g_hWordStatus = GetDlgItem(hDlg, IDC_EDIT_WORD);    // 제시어 표시하는 EditText 부분
 		hBtnGameStart = GetDlgItem(hDlg, IDC_GAMESTART);
-		EnableWindow(hBtnGameStart, FALSE);
+		//EnableWindow(hBtnGameStart, FALSE);
 
 		g_hDrawDlg = hDlg;
 		WideCharToMultiByte(CP_ACP, 0, ID_NICKNAME, 256, NICKNAME_CHAR, 256, NULL, NULL); //_TCHAR 형 문자열을 char* 형 문자열로 변경
@@ -338,18 +279,17 @@ INT_PTR CALLBACK DlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		case IDC_GAMESTART:
 
 			// ========= 연경 =========
-			EnableWindow(hBtnGameStart, TRUE);
 
 			//WaitForSingleObject(g_hReadEvent, INFINITE);
 			//SetEvent(g_hWriteEvent);
 			//isMessageQueue = TRUE;
 			// 이전에 얻은 채팅 메시지 읽기 완료를 기다림
 
-			EnableWindow(hBtnGameStart, FALSE);
+			EnableWindow(hBtnGameStart, TRUE);
 			// 이전에 얻은 채팅 메시지 읽기 완료를 기다림
 			WaitForSingleObject(g_hReadEvent, INFINITE);
 			// 새로운 채팅 메시지를 얻고 쓰기 완료를 알림
-			g_chatmsg.type = TYPE_NOTY;
+			g_chatmsg.type = TYPE_START;
 			strcpy(g_chatmsg.msg, "게임이 시작됩니다!");
 			SetEvent(g_hWriteEvent);
 			//	gameStart(g_hTimerStatus, g_hWordStatus);
@@ -359,7 +299,7 @@ INT_PTR CALLBACK DlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 			// ========= 지윤 =========
 
-			DisplayDrawingUserID(hDlg, userIDs);
+			//DisplayDrawingUserID(hDlg, userIDs);
 
 			return TRUE;
 		case IDC_SENDFILE:
@@ -736,6 +676,7 @@ LRESULT CALLBACK ChildWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 LRESULT CALLBACK LoginWndProc(HWND hwndLogin, UINT msg, WPARAM wParam, LPARAM lParam) {
 	
 	int retval;
+
 	switch (msg) {
 
 	case WM_CREATE:
@@ -782,7 +723,6 @@ LRESULT CALLBACK LoginWndProc(HWND hwndLogin, UINT msg, WPARAM wParam, LPARAM lP
 
 			// ==================== 지윤 ====================
 			AddUser(userIDs, input_result);
-			g_isLogin = TRUE;
 			// ==============================================
 
 			CreateAndShowWindow_Home(hwndHome); // 메인 생성 및 보이게하기
@@ -869,6 +809,7 @@ LRESULT CALLBACK LoginWndProc(HWND hwndLogin, UINT msg, WPARAM wParam, LPARAM lP
 LRESULT CALLBACK HomeWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	static HWND hAChannelDlg = NULL;
 	static HWND hBChannelDlg = NULL;
+
 	switch (msg) {
 
 	case WM_CREATE:
@@ -1206,7 +1147,8 @@ DWORD WINAPI ClientMain(LPVOID arg)
 			group1Connect.type = 0;
 			group1Connect.groupNum = TYPE_GROUP_A;
 			g_UDPGroupNum = TYPE_GROUP_A;
-			char buf[BUFSIZE + 1] = "hello, I'am UDP JIAN. UDP Channel1 !!";
+			char buf[BUFSIZE + 1];
+			strcpy(buf,NICKNAME_CHAR);
 			memcpy(group1Connect.dummy, buf, sizeof(group1Connect.dummy));
 
 			// 기타 데이터들 그룹 초기화
@@ -1382,6 +1324,7 @@ DWORD WINAPI ReadThread(LPVOID arg)
 		//}
 		retval = recvn(g_sock, (char*)&comm_msg, BUFSIZE, 0, serveraddr, g_isUDP);
 
+		char selectedName[256];
 		if (retval == 0 || retval == SOCKET_ERROR) {
 			err_display("recv()");
 			break;
@@ -1436,10 +1379,31 @@ DWORD WINAPI ReadThread(LPVOID arg)
 			chat_msg = (CHAT_MSG*)&comm_msg;
 			DisplayText("%s\r\n", chat_msg->msg);
 			break;
+		case TYPE_START:
 		case TYPE_NOTY:
 			chat_msg = (CHAT_MSG*)&comm_msg;
 			DisplayText("%s\r\n", chat_msg->msg);
 			break;
+		case TYPE_SELECT:
+			strcpy(selectedName, comm_msg.dummy);
+			_TCHAR selectedName_T[BUFSIZE];
+			if (strcmp(selectedName, NICKNAME_CHAR) == 0) {  // 만약 현재 클라이언트가 선택되었다면
+				// char* 형 문자열을 _TCHAR 형 문자열로 변환
+				isOwner = TRUE; // 그림 그리는 사람(Owner)임을 TRUE 체크
+			}
+			else {
+				isOwner = FALSE;
+			}
+
+			MultiByteToWideChar(CP_ACP, 0, selectedName, -1, selectedName_T, BUFSIZE);
+			DisplayDrawingUserID(g_hDrawDlg, selectedName_T);
+			//if (_tcscpy(ptr->id_nickname, selectedName_T) == NULL) {
+			//	// Handle the error
+			//	err_display("setIDInSocket");
+			//}
+			break;
+		// =================================
+
 		case TYPE_DRAWLINE:
 			drawline_msg = (DRAWLINE_MSG*)&comm_msg;
 			// ============ 지윤 ============

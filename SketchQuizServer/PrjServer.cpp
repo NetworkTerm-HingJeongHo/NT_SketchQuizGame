@@ -142,32 +142,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_CREATE:
 		/* 클라이언트 목록 */
 		InitializeListView(hWnd);
-		CreateWindow(_T("BUTTON"), _T("사용자 강제퇴장"), WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
-			10, 220, 200, 30, hWnd, (HMENU)CLIENTOUT, NULL, NULL);
 		/* 채팅 데이터 */
 		InitializeChatListView(hWnd);
-		return 0;
-	case WM_COMMAND:
-		switch (LOWORD(wParam))
-		{
-		case CLIENTOUT:
-			if (g_selectedIndex != -1) {
-				// 선택한 클라이언트를 제거하는 코드 추가
-				RemoveClientFromListViewAndSock(g_selectedIndex);
-
-				// 선택을 해제하고 g_selectedIndex를 초기화
-				ListView_SetItemState(g_hListView, g_selectedIndex, 0, LVIS_SELECTED);
-				g_selectedIndex = -1;
-			}
-			break;
-		}
-		return 0;
-	case WM_NOTIFY:
-		if (((LPNMHDR)lParam)->code == NM_CLICK) {
-			// ListView에서 클릭 이벤트를 처리하여 선택한 클라이언트의 인덱스를 저장
-			NMITEMACTIVATE* pnmia = (NMITEMACTIVATE*)lParam;
-			g_selectedIndex = pnmia->iItem;
-		}
 		return 0;
 		// ============ 정호 ============
 	case WM_SOCKET: // 소켓 관련 윈도우 메시지
@@ -401,7 +377,7 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			if (groupNumUDP == -1)
 			{
 				// UDP로 접속한 클라 정보 수집
-				AddSocketInfoUDP(clientaddr, ((COMM_MSG*)&buf)->groupNum);
+				AddSocketInfoUDP(clientaddr, ((COMM_MSG*)&buf)->groupNum, ((COMM_MSG*)&buf)->dummy);
 			}
 
 			printf("[UDP] 데이터 길이 : %d, 데이터 : %s\n", retval, ((COMM_MSG*)&buf)->dummy);
@@ -416,14 +392,25 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			switch (comm_msg->type) {
 			case TYPE_NOTY:
 			case TYPE_ENTER: { //입장했다는 메시지인 경우 해당 클라이언트에게 이전 메시지 내용 전송
+				// ================= 지윤 =================
+				ClearChatListView();
+				// ========================================
+				
 				UDPINFO* clientUDP = UDPSocketInfoArray[nTotalSockets - 1];  //가장 최근 접속한 소켓
 				COMM_MSG sendMsg;
 				sendMsg.type = TYPE_CHAT;
-				FILE* sendFd = fopen("chatting_log.txt", "r");
+				FILE* sendFd;
+				if(comm_msg->groupNum== TYPE_GROUP_A)
+					sendFd = fopen("chatting_log_1.txt", "r");
+				else 
+					sendFd = fopen("chatting_log_2.txt", "r");
+				
 				printf("======== 이전 채팅 내용 ======= \n");
 				while (fgets(sendMsg.dummy, BUFSIZE, sendFd)) {
 					printf("%s\n", sendMsg.dummy);
-					AddChatMessageToListView((_TCHAR*)sendMsg.dummy);
+					// ================= 지윤 =================
+					AddChatMessageToListView(sendMsg.dummy);
+					// ========================================
 					// 데이터 보내기
 					if (groupNumUDP == clientUDP->groupNum)
 					{
@@ -443,15 +430,60 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				}
 				printf("=========================\n");
 				fclose(sendFd);
+				break;
+			}
+			case TYPE_START: {
+				int randomIndex;
+				while (true) {
+
+					// 시드값 설정
+					srand((unsigned)time(NULL));
+
+					// 랜덤 인덱스 생성
+					randomIndex = rand() % nTotalSockets;
+					if (UDPSocketInfoArray[randomIndex]->groupNum == groupNumUDP) break;  // 같은 그룹 내에서 선택 성공한 경우 빠져나오기
+				}
+				// 랜덤으로 선택된 사용자 아이디 반환
+				char* selectedName = UDPSocketInfoArray[randomIndex]->id_nickname;
+
+				for (int i = 0; i < nTotalUDPSockets; i++)
+				{
+					COMM_MSG sendMsg;
+					sendMsg.type = TYPE_SELECT;
+					strcpy(sendMsg.dummy, selectedName);
+					// 같은 그룹에만 데이터 전송
+					UDPINFO* clientUDP = UDPSocketInfoArray[i];
+					printf("send groupNumUDP : %d, clientUDP->GroupNum : %d\n", groupNumUDP, clientUDP->groupNum);
+					if (groupNumUDP == clientUDP->groupNum)
+					{
+						// 데이터 보내기
+						retval = sendto(socket_UDP, (char*)&sendMsg, BUFSIZE, 0, (SOCKADDR*)&clientUDP->addr, sizeof(clientUDP->addr));
+						if (retval == SOCKET_ERROR) {
+							err_display("sendto()");
+							return;
+						}
+						printf("sendto retval : %d\n", retval);
+					}
+				}
+				break;
 			}
 
-			case TYPE_CHAT:
-				FILE* fd = fopen("chatting_log.txt", "a");
+
+			case TYPE_CHAT: {
+				FILE* fd;
+				if (comm_msg->groupNum == TYPE_GROUP_A)
+					fd = fopen("chatting_log_1.txt", "a");
+				else
+					fd = fopen("chatting_log_2.txt", "a");
 				char n = '\n';
 				fwrite(msg, sizeof(char), strlen(msg), fd);
 				fwrite(&n, sizeof(char), sizeof(n), fd);
+				// ================= 지윤 =================
+				AddChatMessageToListView(msg);
+				// ========================================
 				fclose(fd);
 				break;
+			}
 
 			}
 
@@ -505,7 +537,6 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		break;
 	case FD_CLOSE:
 		RemoveSocketInfo(wParam);
-
 		break;
 	}
 }
@@ -527,7 +558,7 @@ SOCKETINFO* GetSocketInfo(SOCKET sock)
 }
 
 // UDP 클라 정보 추가
-bool AddSocketInfoUDP(SOCKADDR_IN addr, int groupNum)
+bool AddSocketInfoUDP(SOCKADDR_IN addr, int groupNum, char* id_nickname)
 {
 	// 이전에 접속한 적이 있는 상태인지 확인
 	for (int i = 0; i < nTotalUDPSockets; i++)
@@ -552,6 +583,7 @@ bool AddSocketInfoUDP(SOCKADDR_IN addr, int groupNum)
 	}
 	newUDPClient->addr = addr;
 	newUDPClient->groupNum = groupNum;
+	strcpy(newUDPClient->id_nickname, id_nickname);
 
 	// UDP 클라 정보 추가
 	UDPSocketInfoArray[nTotalUDPSockets++] = newUDPClient;

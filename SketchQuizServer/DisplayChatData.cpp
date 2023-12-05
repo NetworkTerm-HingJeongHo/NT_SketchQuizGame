@@ -13,13 +13,20 @@ void InitializeChatListView(HWND hWnd) {
     ListView_InsertColumn(g_hChatListView, 0, &lvc1);
 }
 
-void AddChatMessageToListView(_TCHAR* message) {
+void AddChatMessageToListView(char* message) {
     LVITEM lvItem = { 0 };
     lvItem.mask = LVIF_TEXT | LVIF_PARAM;
     lvItem.iItem = 0;
     lvItem.iSubItem = 0;
 
-    lvItem.pszText = message;
+    // 문자열의 길이 계산
+    int length = strlen(message) + 1;
+
+    // 필요한 버퍼를 할당하고 문자열을 와이드 문자열로 변환
+    wchar_t* portStrW = (wchar_t*)malloc(length * sizeof(wchar_t));
+    MultiByteToWideChar(CP_ACP, 0, message, -1, portStrW, length);
+
+    lvItem.pszText = portStrW;
 
     ListView_InsertItem(g_hChatListView, &lvItem);
     DisplayChatList();
@@ -30,4 +37,9 @@ void DisplayChatList() {
     // 채팅 데이터가 변경되었을 때 호출하여 리스트 뷰를 업데이트합니다.
     ListView_RedrawItems(g_hChatListView, 0, ListView_GetItemCount(g_hChatListView) - 1);
     UpdateWindow(g_hChatListView);
+}
+
+void ClearChatListView() {
+    ListView_DeleteAllItems(g_hChatListView);
+    DisplayChatList();
 }

@@ -70,10 +70,10 @@ _TCHAR* SetRandomUserID(_TCHAR* userIDs[]) {
 	return userIDs[randomIndex];
 }
 
-void DisplayDrawingUserID(HWND hDlg, _TCHAR* userIDs[]) {
+void DisplayDrawingUserID(HWND hDlg, _TCHAR* userIDs) {
 	HWND hStaticText = GetDlgItem(hDlg, IDC_DRAWINGTEXTID);
 	if (hStaticText != NULL) {
-		_TCHAR* drawingUserID = SetRandomUserID(userIDs); // 랜덤 사용자 아이디를 가져옴
+		_TCHAR* drawingUserID = userIDs; // 랜덤 사용자 아이디를 가져옴
 		if (drawingUserID != NULL) {
 			SetWindowText(hStaticText, drawingUserID); // 텍스트 설정
 		}
