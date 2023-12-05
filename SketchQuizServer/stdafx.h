@@ -11,6 +11,8 @@
 
 // ==== ¿¬°æ ====
 #include "chatting.h"
+#include "Game.h"
+#include <time.h>
 // ===========
 // 
 // ==== ÁöÀ± ====//

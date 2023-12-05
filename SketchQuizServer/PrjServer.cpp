@@ -374,7 +374,12 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				UDPINFO* clientUDP = UDPSocketInfoArray[nTotalSockets - 1];  //가장 최근 접속한 소켓
 				COMM_MSG sendMsg;
 				sendMsg.type = TYPE_CHAT;
-				FILE* sendFd = fopen("chatting_log.txt", "r");
+				FILE* sendFd;
+				if(comm_msg->groupNum== TYPE_GROUP_A)
+					sendFd = fopen("chatting_log_1.txt", "r");
+				else 
+					sendFd = fopen("chatting_log_2.txt", "r");
+					
 				printf("======== 이전 채팅 내용 ======= \n");
 				while (fgets(sendMsg.dummy, BUFSIZE, sendFd)) {
 					printf("%s\n", sendMsg.dummy);
@@ -399,9 +404,15 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				printf("=========================\n");
 				fclose(sendFd);
 			}
+			case TYPE_START:
+
 
 			case TYPE_CHAT:
-				FILE* fd = fopen("chatting_log.txt", "a");
+				FILE* fd;
+				if(comm_msg->groupNum== TYPE_GROUP_A)
+					fd = fopen("chatting_log_1.txt", "a");
+				else 
+					fd = fopen("chatting_log_2.txt", "a");
 				char n = '\n';
 				fwrite(msg, sizeof(char), strlen(msg), fd);
 				fwrite(&n, sizeof(char), sizeof(n), fd);
