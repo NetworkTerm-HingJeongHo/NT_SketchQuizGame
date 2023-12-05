@@ -4,7 +4,6 @@
 #define MAX_USERS 10 // 최대 사용자 수
 static int			numUsers; // 현재 사용자 수
 static _TCHAR*		userIDs[MAX_USERS];
-static _TCHAR*		drawingUserID;
 
 // 타입 정의
 // ======================= 정호 =======================
