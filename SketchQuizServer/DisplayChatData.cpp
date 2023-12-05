@@ -5,35 +5,23 @@ void InitializeChatListView(HWND hWnd) {
         WS_CHILD | WS_VISIBLE | WS_BORDER | LVS_REPORT | LVS_SINGLESEL,
         220, 10, 350, 240, hWnd, NULL, NULL, NULL);
 
-    // 첫 번째 열 추가 (아이디)
+    // 첫 번째 열 추가
     LVCOLUMN lvc1;
     lvc1.mask = LVCF_TEXT | LVCF_WIDTH;
-    lvc1.cx = 100;  // 첫 번째 열의 너비 설정
-    lvc1.pszText = (LPWSTR)_T("ID");  // 첫 번째 열에 "Time" 표시
+    lvc1.cx = 350;  // 첫 번째 열의 너비 설정
+    lvc1.pszText = (LPWSTR)_T("Chat Data"); 
     ListView_InsertColumn(g_hChatListView, 0, &lvc1);
-
-    // 두 번째 열 추가 (메시지)
-    LVCOLUMN lvc2;
-    lvc2.mask = LVCF_TEXT | LVCF_WIDTH;
-    lvc2.cx = 250;  // 두 번째 열의 너비 설정
-    lvc2.pszText = (LPWSTR)_T("Message");  // 두 번째 열에 "Message" 표시
-    ListView_InsertColumn(g_hChatListView, 1, &lvc2);
 }
 
-void AddChatMessageToListView(_TCHAR* id, _TCHAR* message) {
+void AddChatMessageToListView(_TCHAR* message) {
     LVITEM lvItem = { 0 };
     lvItem.mask = LVIF_TEXT | LVIF_PARAM;
     lvItem.iItem = 0;
     lvItem.iSubItem = 0;
 
-    // 아이디 추가
-    lvItem.pszText = id;
+    lvItem.pszText = message;
 
-    // 첫 번째 열에 아이디 추가
-    int index = ListView_InsertItem(g_hChatListView, &lvItem);
-
-    // 두 번째 열에 메시지 추가
-    ListView_SetItemText(g_hChatListView, index, 1, message);
+    ListView_InsertItem(g_hChatListView, &lvItem);
     DisplayChatList();
 }
 

@@ -11,6 +11,9 @@ int channel;	//udp 채널 가져오기. stdafx.h 파일에 같은 주소에 저장하기 위함
 
 //-------------------------------//
 
+// ================ ji yoon ================
+static BOOL			 g_isLogin = FALSE;		  // 로그인 여부
+
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
 	// 윈속 초기화
