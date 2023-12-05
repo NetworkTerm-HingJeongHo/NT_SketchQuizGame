@@ -58,12 +58,22 @@ int BoradcaseSendToNotice(_TCHAR* input_notice_result)
 	// 데이터 입력
 										//바꿀 대상 - 저장할 곳
 	WideCharToMultiByte(CP_ACP, 0, input_notice_result, 256, buf, 256, NULL, NULL); //_TCHAR 형 문자열을 char* 형 문자열로 변경
+
+	// ================== //
+
+	// notice_msg 구조체 초기화
+	NOTICE_MSG notice_msg;
+	notice_msg.type = TYPE_NOTICE;	// notice (공지사항) 타입
+	strcpy(notice_msg.msg, buf);	// msg에 공지사항 내용을 넣는다. (char)
+	// ================== //
+	
 	// 데이터 보내기
-	retval = sendto(sock, buf, strlen(buf), 0,
+	retval = sendto(sock, (char*)&notice_msg, strlen(buf), 0,
 		(SOCKADDR*)&remoteaddr, sizeof(remoteaddr)); //&remoteaddr : 보낼때 목적지 주소를 무조건 넣어줘야한다.
 	if (retval == SOCKET_ERROR) {
 		err_display("sendto()");
 	}
+	MessageBox(NULL, input_notice_result, _T("UDP 데이터를 보냈어요"), MB_OK);
 	//printf("[UDP] %d바이트를 보냈습니다.\n", retval);
 
 

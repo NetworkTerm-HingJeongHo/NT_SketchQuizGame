@@ -1373,6 +1373,14 @@ DWORD WINAPI ReadThread(LPVOID arg)
 
 		switch (comm_msg.type)
 		{
+		// ============== 지안 ================ //
+		case TYPE_NOTICE:
+			MessageBox(NULL, _T("받은내용"), _T("UDP 데이터를 받았어요."), MB_OK);
+			NOTICE_MSG* notice_msg;
+			notice_msg = (NOTICE_MSG*)&comm_msg;
+			DisplayText("%s\r\n", notice_msg->msg);
+
+		// ==================================== //
 			// ============ 연경 ==========
 		case TYPE_CHAT:
 			chat_msg = (CHAT_MSG*)&comm_msg;
