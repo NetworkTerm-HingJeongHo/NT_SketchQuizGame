@@ -277,7 +277,7 @@ INT_PTR CALLBACK DlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		EnableWindow(hBtnGameStart, TRUE);
 		WaitForSingleObject(g_hReadEvent, INFINITE);
 		// 새로운 채팅 메시지를 얻고 쓰기 완료를 알림
-		g_chatmsg.type = TYPE_NOTY;
+		g_chatmsg.type = TYPE_ENTER;
 		sprintf(g_chatmsg.msg, "[%s] 님이 입장하였습니다!", NICKNAME_CHAR);
 		SetEvent(g_hWriteEvent);
 
@@ -753,9 +753,11 @@ LRESULT CALLBACK ChildWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 // 로그인 윈도우 프로시저 (로그인 영역) -----------------------------------------------------------------------------------//
 LRESULT CALLBACK LoginWndProc(HWND hwndLogin, UINT msg, WPARAM wParam, LPARAM lParam) {
 	g_isDup == 0; //중복확인 비활성화
+	int retval;
 	switch (msg) {
 
 	case WM_CREATE:
+		LoginProcessClientThread = CreateThread(NULL, 0, LoginProcessClient, NULL, 0, NULL);
 		// 로그인 화면 초기화 및 컨트롤 생성
 																								   //x,y,width,height
 		CreateWindow(_T("STATIC"), _T("스케치퀴즈"), WS_VISIBLE | WS_CHILD | SS_CENTER | SS_CENTERIMAGE, 500, 100, 300, 100, hwndLogin, NULL, NULL, NULL); // 스케치퀴즈 타이틀
@@ -778,6 +780,22 @@ LRESULT CALLBACK LoginWndProc(HWND hwndLogin, UINT msg, WPARAM wParam, LPARAM lP
 		case ID_LOGIN_BUTTON: // 로그인 버튼을 클릭했을 시
 			
 			_tcscpy(ID_NICKNAME, input_result); // 현재 입력한 ID 저장
+
+			// ---------- 서버로 최종 id 전송 --------------- //
+			// id_msg 구조체 초기화
+			ID_RESULT_MSG id_result_msg;
+			id_result_msg.type = TYPE_ID_RESULT;	//id타입
+			strcpy(id_result_msg.msg, NICKNAME_CHAR);	//NICKNAME_CHAR일 경우
+			
+			retval = sendn(g_sock, (char*)&id_result_msg, BUFSIZE, 0, serveraddr, false); // 최종 id 보내기
+
+			//printf("[TCP 클라이언트] %d바이트를 보냈습니다.\n", retval);
+			if (retval == SOCKET_ERROR) {
+				err_display("send()");
+				//break;
+			}
+
+			// --------------------------------------------- //
 			MessageBox(hwndLogin, ID_NICKNAME, _T("메인 화면으로 이동합니다."), MB_OK);
 
 			// ==================== 지윤 ====================
@@ -797,13 +815,27 @@ LRESULT CALLBACK LoginWndProc(HWND hwndLogin, UINT msg, WPARAM wParam, LPARAM lP
 			GetDlgItemText(hwndLogin, ID_ID_INPUT, input_result, sizeof(input_result));
 
 
-			// ---- 로그인 할때 TCP 연결 ---- //
+			// ---- TPC 연결한거에 고정 크기 데이터 전송 ---- //
 			_tcscpy(ID_NICKNAME, input_result); // 현재 입력한 ID 저장
 			WideCharToMultiByte(CP_ACP, 0, ID_NICKNAME, 256, NICKNAME_CHAR, 256, NULL, NULL); //_TCHAR 형 문자열을 char* 형 문자열로 변경
-			// 스레드 생성!
+
+			// id_msg 구조체 초기화
+			ID_MSG id_msg;
+			id_msg.type = TYPE_ID;	//id타입
+			strcpy(id_msg.msg, NICKNAME_CHAR);	//NICKNAME_CHAR일 경우
+
+			
+			retval = sendn(g_sock, (char*)&id_msg, BUFSIZE, 0, serveraddr, false);
+
+			//printf("[TCP 클라이언트] %d바이트를 보냈습니다.\n", retval);
+			if (retval == SOCKET_ERROR) {
+				err_display("send()");
+				//break;
+			}
+			// 스레드 !생성
 			//LoginProcessClient(); //TCP 연결. ->
 			// 스레드 생성
-			LoginProcessClientThread = CreateThread(NULL, 0, LoginProcessClient, NULL, 0, NULL);
+			//LoginProcessClientThread = CreateThread(NULL, 0, LoginProcessClient, NULL, 0, NULL);
 
 			//// 스레드 종료 대기
 			//WaitForSingleObject(LoginProcessClientThread, INFINITE);
@@ -865,19 +897,17 @@ LRESULT CALLBACK HomeWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) 
 
 		CreateWindow(_T("BUTTON"), _T("공지 전송"), WS_VISIBLE | WS_CHILD, 1042, 185, 174, 54, hwnd, (HMENU)ID_NOTICE_BUTTON, NULL, NULL); // 공지 전송
 
-		CreateWindow(_T("BUTTON"), _T("TCP 채널 	"), WS_VISIBLE | WS_CHILD, 300, 200, 640, 100, hwnd, (HMENU)ID_CHANNEL_A_BUTTON, NULL, NULL); // 채널 A 입장
-		CreateWindow(_T("BUTTON"), _T("UDP 채널1 입장"), WS_VISIBLE | WS_CHILD, 300, 350, 640, 100, hwnd, (HMENU)ID_CHANNEL_B_BUTTON, NULL, NULL); // 채널 B 입장
+		//CreateWindow(_T("BUTTON"), _T("TCP 채널 	"), WS_VISIBLE | WS_CHILD, 300, 200, 640, 100, hwnd, (HMENU)ID_CHANNEL_A_BUTTON, NULL, NULL); // 채널 A 입장
+		CreateWindow(_T("BUTTON"), _T("UDP 채널1 입장"), WS_VISIBLE | WS_CHILD, 300, 250, 640, 150, hwnd, (HMENU)ID_CHANNEL_B_BUTTON, NULL, NULL); // 채널 B 입장
+		CreateWindow(_T("BUTTON"), _T("UDP 채널2 입장"), WS_VISIBLE | WS_CHILD, 300, 450, 640, 150, hwnd, (HMENU)ID_CHANNEL_RANDOM_BUTTON, NULL, NULL); // 랜덤 입장
 
 		//CreateWindow(L"BUTTON", L"방만들기", WS_VISIBLE | WS_CHILD, 282, 600, 320, 67, hwnd, (HMENU)ID_BACKHOME_BUTTON, NULL, NULL); // 방 만들기
-		CreateWindow(_T("BUTTON"), _T("UDP 채널2 입장"), WS_VISIBLE | WS_CHILD, 300, 500, 640, 100, hwnd, (HMENU)ID_CHANNEL_RANDOM_BUTTON, NULL, NULL); // 랜덤 입장
+
 
 
 		CreateWindow(_T("BUTTON"), _T("돌아가기"), WS_VISIBLE | WS_CHILD, 100, 100, 100, 30, hwnd, (HMENU)ID_BACKHOME_BUTTON, NULL, NULL); // 돌아가기
 		break;
-		//----//
-		//CreateWindow(_T("BUTTON"), _T("UDP 채널1 입장"), WS_VISIBLE | WS_CHILD, 300, 250, 640, 150, hwnd, (HMENU)ID_CHANNEL_B_BUTTON, NULL, NULL); // 채널 B 입장
-		//CreateWindow(_T("BUTTON"), _T("UDP 채널2 입장"), WS_VISIBLE | WS_CHILD, 300, 450, 640, 150, hwnd, (HMENU)ID_CHANNEL_RANDOM_BUTTON, NULL, NULL); // 랜덤 입장
-		//----//
+
 
 	case WM_COMMAND:
 		// 버튼 클릭 이벤트 처리
@@ -1042,11 +1072,11 @@ LRESULT CALLBACK Home_PassWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPa
 // 클라이언트와 데이터 통신
 DWORD WINAPI LoginProcessClient(LPVOID arg)
 {
-	// ====== 지안 ========= //
-	// id_msg 구조체 초기화
-	ID_MSG id_msg;
-	id_msg.type = TYPE_ID;	//id타입
-	strcpy(id_msg.msg, NICKNAME_CHAR);	//NICKNAME_CHAR일 경우
+	//// ====== 지안 ========= //
+	//// id_msg 구조체 초기화
+	//ID_MSG id_msg;
+	//id_msg.type = TYPE_ID;	//id타입
+	//strcpy(id_msg.msg, NICKNAME_CHAR);	//NICKNAME_CHAR일 경우
 
 	// ===================== //
 	int retval;
@@ -1067,14 +1097,14 @@ DWORD WINAPI LoginProcessClient(LPVOID arg)
 	int len;
 	len = sizeof(NICKNAME_CHAR);
 
-	// 고정 크기 데이터 전송 (TCP 첫 실행시 한번)
-	retval = sendn(g_sock, (char*)&id_msg, BUFSIZE, 0, serveraddr, false);
+	//// 고정 크기 데이터 전송 (TCP 첫 실행시 한번)
+	//retval = sendn(g_sock, (char*)&id_msg, BUFSIZE, 0, serveraddr, false);
 
-	printf("[TCP 클라이언트] %d바이트를 보냈습니다.\n", retval);
-	if (retval == SOCKET_ERROR) {
-		err_display("send()");
-		//break;
-	}
+	//printf("[TCP 클라이언트] %d바이트를 보냈습니다.\n", retval);
+	//if (retval == SOCKET_ERROR) {
+	//	err_display("send()");
+	//	//break;
+	//}
 
 	
 	//char recvBuf[BUFSIZE]; // 데이터 받을 버퍼
@@ -1167,13 +1197,23 @@ DWORD WINAPI ClientMain(LPVOID arg)
 			serveraddr.sin_addr.s_addr = inet_addr(SERVERIP4_CHAR_UDP1);
 			serveraddr.sin_port = htons(SERVERPORT);
 
-
-			// 데이터 통신에 사용할 변수
+			// ===== 정호 ======
+			// 접속 데이터 전송
+			COMM_MSG group1Connect;
+			group1Connect.type = 0;
+			group1Connect.groupNum = TYPE_GROUP_A;
+			g_UDPGroupNum = TYPE_GROUP_A;
 			char buf[BUFSIZE + 1] = "hello, I'am UDP JIAN. UDP Channel1 !!";
-			int len;
+			memcpy(group1Connect.dummy, buf, sizeof(group1Connect.dummy));
+
+			// 기타 데이터들 그룹 초기화
+			g_drawellipsemsg.groupNum = TYPE_GROUP_A;
+			g_drawpolygonmsg.groupNum = TYPE_GROUP_A;
+			g_chatmsg.groupNum = TYPE_GROUP_A;
+			g_drawlinemsg.groupNum = TYPE_GROUP_A;
 
 			// 데이터 보내기
-			retval = sendto(g_sock, buf, BUFSIZE, 0,
+			retval = sendto(g_sock, (char*)&group1Connect, BUFSIZE, 0,
 				(SOCKADDR*)&serveraddr, sizeof(serveraddr));
 			if (retval == SOCKET_ERROR) {
 				err_display("sendto()");
@@ -1207,12 +1247,23 @@ DWORD WINAPI ClientMain(LPVOID arg)
 			serveraddr.sin_addr.s_addr = inet_addr(SERVERIP4_CHAR_UDP2);
 			serveraddr.sin_port = htons(SERVERPORT);
 
-			// 데이터 통신에 사용할 변수
+			// ===== 정호 ======
+			// 접속 데이터 전송
+			COMM_MSG group2Connect;
+			group2Connect.type = 0;
+			group2Connect.groupNum = TYPE_GROUP_B;
+			g_UDPGroupNum = TYPE_GROUP_B;
 			char buf[BUFSIZE + 1] = "hello, I'am UDP JIAN. UDP Channel2 !!";
-			int len;
+			memcpy(group2Connect.dummy, buf, sizeof(group2Connect.dummy));
+
+			// 기타 데이터들 그룹 초기화
+			g_drawellipsemsg.groupNum = TYPE_GROUP_B;
+			g_drawpolygonmsg.groupNum = TYPE_GROUP_B;
+			g_chatmsg.groupNum = TYPE_GROUP_B;
+			g_drawlinemsg.groupNum = TYPE_GROUP_B;
 
 			// 데이터 보내기
-			retval = sendto(g_sock, buf, strlen(buf), 0,
+			retval = sendto(g_sock, (char*)&group2Connect, BUFSIZE, 0,
 				(SOCKADDR*)&serveraddr, sizeof(serveraddr));
 			if (retval == SOCKET_ERROR) {
 				err_display("sendto()");
@@ -1363,6 +1414,7 @@ DWORD WINAPI ReadThread(LPVOID arg)
 			}
 
 			break;
+		case TYPE_ENTER:
 		case TYPE_NOTY:
 			chat_msg = (CHAT_MSG*)&comm_msg;
 			DisplayText("%s\r\n", chat_msg->msg);
