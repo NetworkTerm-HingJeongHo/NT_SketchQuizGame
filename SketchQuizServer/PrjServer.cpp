@@ -359,7 +359,7 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				printf("======== 이전 채팅 내용 ======= \n");
 				while (fgets(sendMsg.dummy, BUFSIZE, sendFd)) {
 					printf("%s\n", sendMsg.dummy);
-					AddChatMessageToListView((_TCHAR*)sendMsg.dummy);
+					AddChatMessageToListView(sendMsg.dummy);
 					// 데이터 보내기
 					if (groupNumUDP == clientUDP->groupNum)
 					{
