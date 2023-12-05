@@ -147,6 +147,7 @@
     <ClCompile Include="chatting.cpp" />
     <ClCompile Include="DisplayChatData.cpp" />
     <ClCompile Include="DisplayClientList.cpp" />
+    <ClCompile Include="Game.cpp" />
     <ClCompile Include="Login.cpp" />
     <ClCompile Include="PrjServer.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -158,6 +159,7 @@
     <ClInclude Include="chatting.h" />
     <ClInclude Include="DisplayChatData.h" />
     <ClInclude Include="DisplayClientList.h" />
+    <ClInclude Include="Game.h" />
     <ClInclude Include="Login.h" />
     <ClInclude Include="PrjServer.h" />
     <ClInclude Include="resource.h" />

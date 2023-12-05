@@ -11,6 +11,7 @@
 #define TYPE_CHAT     5000              // 메시지 타입: 채팅
 #define TYPE_ENTER    5001              // 메시지 타입: 입장했을 경우->서버가 이를 알고 이전채팅내용전송
 #define TYPE_NOTY     5002  // 입장, 퇴장, 새 라운드 알림 메시지 출력
+#define TYPE_START    5003
 // ==============
 
 #define TYPE_DRAWLINE 1001              // 메시지 타입: 선 그리기
