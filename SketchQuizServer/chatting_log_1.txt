@@ -1,6 +1,6 @@
-== ì±„ë„ 1 ì±„íŒ…ë³µì›
+== Ã¤³Î 1 Ã¤ÆÃº¹¿ø
 
-[asdf] ë‹˜ì´ ì…ì¥í•˜ì˜€ìŠµë‹ˆë‹¤!
+[asdf] ´ÔÀÌ ÀÔÀåÇÏ¿´½À´Ï´Ù!
 {asdf} aaaaaaa
 {asdf} gggggggggggg
 {asdf} asdfsadfsadfsadf{aaaa} aaaaa
