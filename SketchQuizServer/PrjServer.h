@@ -18,8 +18,8 @@
 #define SIZE_TOT 256                    // 전송 패킷(헤더 + 데이터) 전체 크기
 #define SIZE_DAT (SIZE_TOT-2*sizeof(int)) // 헤더를 제외한 데이터 부분만의 크기
 
-#define TYPE_ID		1003				// 메시지 타입: id (지안)
-#define TYPE_ID_RESULT 1005				// 메시지 티입 : id 결과
+#define TYPE_ID		2000				// 메시지 타입: id (지안)
+#define TYPE_ID_RESULT 2001				// 메시지 티입 : id 결과
 // ============== //
 
 // ==== 정호 ====
