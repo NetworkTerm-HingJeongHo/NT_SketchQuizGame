@@ -734,7 +734,7 @@ LRESULT CALLBACK ChildWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 
 // 로그인 윈도우 프로시저 (로그인 영역) -----------------------------------------------------------------------------------//
 LRESULT CALLBACK LoginWndProc(HWND hwndLogin, UINT msg, WPARAM wParam, LPARAM lParam) {
-	g_isDup == 0; //중복확인 비활성화
+	
 	int retval;
 	switch (msg) {
 
@@ -942,7 +942,7 @@ LRESULT CALLBACK HomeWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) 
 // 
 // 홈 공지사항 윈도우 프로시저
 LRESULT CALLBACK Home_NoticeWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-
+	int retval;
 	switch (msg) {
 
 	case WM_CREATE:
@@ -968,7 +968,27 @@ LRESULT CALLBACK Home_NoticeWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
 
 			GetDlgItemText(hwnd, ID_NOTICE_INPUT, input_notice_result, sizeof(input_notice_result));
 			MessageBox(hwnd, input_notice_result, _T("공지사항 전송 내용"), MB_OK); // 공지사항 전송할 내용 띄우기
-			BoradcaseSendToNotice(input_notice_result); //전송가느자
+			//BoradcaseSendToNotice(input_notice_result); //전송가느자
+			// --------- TCP 서버로 데이터 공지사항 전송 -------- //
+			// 데이터 통신에 사용할 변수
+			char buf[257];
+			int len;
+			// TCHAR -> char* 변경
+			WideCharToMultiByte(CP_ACP, 0, input_notice_result, 256, buf, 256, NULL, NULL); 
+			// notice_msg 구조체 초기화
+			NOTICE_MSG notice_msg;
+			notice_msg.type = TYPE_NOTICE;	// notice (공지사항) 타입
+			strcpy(notice_msg.msg, buf);	// msg에 공지사항 내용을 넣는다. (char)
+
+			retval = sendn(g_sock, (char*)&notice_msg, BUFSIZE, 0, serveraddr, false); // 최종 id 보내기
+
+			//printf("[TCP 클라이언트] %d바이트를 보냈습니다.\n", retval);
+			if (retval == SOCKET_ERROR) {
+				err_display("send()");
+				//break;
+			}
+
+			// --------------------------------------------- //
 
 			//ShowWindow(hwnd, SW_HIDE);	// 공지사항 입력창 닫기
 			break;
@@ -1373,14 +1393,7 @@ DWORD WINAPI ReadThread(LPVOID arg)
 
 		switch (comm_msg.type)
 		{
-		// ============== 지안 ================ //
-		case TYPE_NOTICE:
-			MessageBox(NULL, _T("받은내용"), _T("UDP 데이터를 받았어요."), MB_OK);
-			NOTICE_MSG* notice_msg;
-			notice_msg = (NOTICE_MSG*)&comm_msg;
-			DisplayText("%s\r\n", notice_msg->msg);
 
-		// ==================================== //
 			// ============ 연경 ==========
 		case TYPE_CHAT:
 			chat_msg = (CHAT_MSG*)&comm_msg;
