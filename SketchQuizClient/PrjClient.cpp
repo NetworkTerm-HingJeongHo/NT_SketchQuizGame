@@ -527,121 +527,79 @@ LRESULT CALLBACK ChildWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 
 			// "사각형" 그리기 모드
 			case MODE_RECTANGLE:
-				g_drawpolygonmsg.type = TYPE_DRAWRECTANGLE;
-				g_drawpolygonmsg.startX = x0;
-				g_drawpolygonmsg.startY = y0;
-				g_drawpolygonmsg.endX = LOWORD(lParam);
-				g_drawpolygonmsg.endY = HIWORD(lParam);
-				g_drawpolygonmsg.color = g_clientDrawDetailInformation.color;
-				g_drawpolygonmsg.width = g_clientDrawDetailInformation.width;
+				ShapeDataInput(g_drawpolygonmsg, TYPE_DRAWRECTANGLE, x0, y0, lParam, g_clientDrawDetailInformation);
 				sendn(g_sock, (char*)&g_drawpolygonmsg, SIZE_TOT, 0, serveraddr, g_isUDP);
 				break;
 
 			// "삼각형" 그리기 모드
 			case MODE_TRIANGLE:
-				g_drawpolygonmsg.type = TYPE_DRAWTRIANGLE;
-				g_drawpolygonmsg.startX = x0;
-				g_drawpolygonmsg.startY = y0;
-				g_drawpolygonmsg.endX = LOWORD(lParam);
-				g_drawpolygonmsg.endY = HIWORD(lParam);
-				g_drawpolygonmsg.color = g_clientDrawDetailInformation.color;
-				g_drawpolygonmsg.width = g_clientDrawDetailInformation.width;
+				ShapeDataInput(g_drawpolygonmsg, TYPE_DRAWTRIANGLE, x0, y0, lParam, g_clientDrawDetailInformation);
 				sendn(g_sock, (char*)&g_drawpolygonmsg, SIZE_TOT, 0, serveraddr, g_isUDP);
 				break;
 
 			// "직선" 그리기 모드
 			case MODE_STRAIGHT:
-				g_drawpolygonmsg.type = TYPE_DRAWSTRAIGHT;
-				g_drawpolygonmsg.startX = x0;
-				g_drawpolygonmsg.startY = y0;
-				g_drawpolygonmsg.endX = LOWORD(lParam);
-				g_drawpolygonmsg.endY = HIWORD(lParam);
-				g_drawpolygonmsg.color = g_clientDrawDetailInformation.color;
-				g_drawpolygonmsg.width = g_clientDrawDetailInformation.width;
+				ShapeDataInput(g_drawpolygonmsg, TYPE_DRAWSTRAIGHT, x0, y0, lParam, g_clientDrawDetailInformation);
 				sendn(g_sock, (char*)&g_drawpolygonmsg, SIZE_TOT, 0, serveraddr, g_isUDP);
 				break;
 
 			// "오각형" 그리기 모드
 			case MODE_PENTAGON:
-				g_drawpolygonmsg.type = TYPE_DRAWPENTAGON;
-				g_drawpolygonmsg.startX = x0;
-				g_drawpolygonmsg.startY = y0;
-				g_drawpolygonmsg.endX = LOWORD(lParam);
-				g_drawpolygonmsg.endY = HIWORD(lParam);
-				g_drawpolygonmsg.color = g_clientDrawDetailInformation.color;
-				g_drawpolygonmsg.width = g_clientDrawDetailInformation.width;
+				ShapeDataInput(g_drawpolygonmsg, TYPE_DRAWPENTAGON, x0, y0, lParam, g_clientDrawDetailInformation);
 				sendn(g_sock, (char*)&g_drawpolygonmsg, SIZE_TOT, 0, serveraddr, g_isUDP);
 				break;
 
 			// "별" 그리기 모드
 			case MODE_STAR:
-				g_drawpolygonmsg.type = TYPE_DRAWSTAR;
-				g_drawpolygonmsg.startX = x0;
-				g_drawpolygonmsg.startY = y0;
-				g_drawpolygonmsg.endX = LOWORD(lParam);
-				g_drawpolygonmsg.endY = HIWORD(lParam);
-				g_drawpolygonmsg.color = g_clientDrawDetailInformation.color;
-				g_drawpolygonmsg.width = g_clientDrawDetailInformation.width;
+				ShapeDataInput(g_drawpolygonmsg, TYPE_DRAWSTAR, x0, y0, lParam, g_clientDrawDetailInformation);
 				sendn(g_sock, (char*)&g_drawpolygonmsg, SIZE_TOT, 0, serveraddr, g_isUDP);
 				break;
 
 			// "사다리꼴" 그리기 모드
 			case MODE_TRAPEZOID:
-				g_drawpolygonmsg.type = TYPE_DRAWTRAPEZOID;
-				g_drawpolygonmsg.startX = x0;
-				g_drawpolygonmsg.startY = y0;
-				g_drawpolygonmsg.endX = LOWORD(lParam);
-				g_drawpolygonmsg.endY = HIWORD(lParam);
-				g_drawpolygonmsg.color = g_clientDrawDetailInformation.color;
-				g_drawpolygonmsg.width = g_clientDrawDetailInformation.width;
+				ShapeDataInput(g_drawpolygonmsg, TYPE_DRAWTRAPEZOID, x0, y0, lParam, g_clientDrawDetailInformation);
 				sendn(g_sock, (char*)&g_drawpolygonmsg, SIZE_TOT, 0, serveraddr, g_isUDP);
 				break;
 
 			// "밤톨" 그리기 모드
 			case MODE_CHESTNUT:
-				g_drawpolygonmsg.type = TYPE_DRAWCHESTNUT;
-				g_drawpolygonmsg.startX = x0;
-				g_drawpolygonmsg.startY = y0;
-				g_drawpolygonmsg.endX = LOWORD(lParam);
-				g_drawpolygonmsg.endY = HIWORD(lParam);
-				g_drawpolygonmsg.color = g_clientDrawDetailInformation.color;
-				g_drawpolygonmsg.width = g_clientDrawDetailInformation.width;
+				ShapeDataInput(g_drawpolygonmsg, TYPE_DRAWCHESTNUT, x0, y0, lParam, g_clientDrawDetailInformation);
 				sendn(g_sock, (char*)&g_drawpolygonmsg, SIZE_TOT, 0, serveraddr, g_isUDP);
 				break;
 
 			// "평행사변형" 그리기 모드
 			case MODE_PARALLELOGRAM:
-				g_drawpolygonmsg.type = TYPE_DRAWPARALLELOGRAM;
-				g_drawpolygonmsg.startX = x0;
-				g_drawpolygonmsg.startY = y0;
-				g_drawpolygonmsg.endX = LOWORD(lParam);
-				g_drawpolygonmsg.endY = HIWORD(lParam);
-				g_drawpolygonmsg.color = g_clientDrawDetailInformation.color;
-				g_drawpolygonmsg.width = g_clientDrawDetailInformation.width;
+				ShapeDataInput(g_drawpolygonmsg, TYPE_DRAWPARALLELOGRAM, x0, y0, lParam, g_clientDrawDetailInformation);
 				sendn(g_sock, (char*)&g_drawpolygonmsg, SIZE_TOT, 0, serveraddr, g_isUDP);
 				break;
 
 			// "마름모" 그리기 모드
 			case MODE_DIAMOND:
-				g_drawpolygonmsg.type = TYPE_DRAWDIAMOND;
-				g_drawpolygonmsg.startX = x0;
-				g_drawpolygonmsg.startY = y0;
-				g_drawpolygonmsg.endX = LOWORD(lParam);
-				g_drawpolygonmsg.endY = HIWORD(lParam);
-				g_drawpolygonmsg.color = g_clientDrawDetailInformation.color;
-				g_drawpolygonmsg.width = g_clientDrawDetailInformation.width;
+				ShapeDataInput(g_drawpolygonmsg, TYPE_DRAWDIAMOND, x0, y0, lParam, g_clientDrawDetailInformation);
 				sendn(g_sock, (char*)&g_drawpolygonmsg, SIZE_TOT, 0, serveraddr, g_isUDP);
 				break;
 
 			// "화살표" 그리기 모드
 			case MODE_ARROW:
-				g_drawpolygonmsg.type = TYPE_DRAWARROW;
-				g_drawpolygonmsg.startX = x0;
-				g_drawpolygonmsg.startY = y0;
-				g_drawpolygonmsg.endX = LOWORD(lParam);
-				g_drawpolygonmsg.endY = HIWORD(lParam);
-				g_drawpolygonmsg.color = g_clientDrawDetailInformation.color;
-				g_drawpolygonmsg.width = g_clientDrawDetailInformation.width;
+				ShapeDataInput(g_drawpolygonmsg, TYPE_DRAWARROW, x0, y0, lParam, g_clientDrawDetailInformation);
+				sendn(g_sock, (char*)&g_drawpolygonmsg, SIZE_TOT, 0, serveraddr, g_isUDP);
+				break;
+
+			// "반짝" 그리기 모드
+			case MODE_SPARKLE:
+				ShapeDataInput(g_drawpolygonmsg, TYPE_DRAWSPARKLE, x0, y0, lParam, g_clientDrawDetailInformation);
+				sendn(g_sock, (char*)&g_drawpolygonmsg, SIZE_TOT, 0, serveraddr, g_isUDP);
+				break;
+
+			// "하트" 그리기 모드
+			case MODE_HEART:
+				ShapeDataInput(g_drawpolygonmsg, TYPE_DRAWHEART, x0, y0, lParam, g_clientDrawDetailInformation);
+				sendn(g_sock, (char*)&g_drawpolygonmsg, SIZE_TOT, 0, serveraddr, g_isUDP);
+				break;
+
+			// "부채꼴" 그리기 모드
+			case MODE_FANSHAPE:
+				ShapeDataInput(g_drawpolygonmsg, TYPE_DRAWFANSHAPE, x0, y0, lParam, g_clientDrawDetailInformation);
 				sendn(g_sock, (char*)&g_drawpolygonmsg, SIZE_TOT, 0, serveraddr, g_isUDP);
 				break;
 
@@ -716,6 +674,21 @@ LRESULT CALLBACK ChildWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 	// 화살표 그리기 메시지 받음
 	case WM_DRAWARROW:
 		DrawPolygonProcess(hWnd, hDCMem, wParam, lParam, g_serverDrawDetailInformation, MODE_ARROW);
+		return 0;
+
+	// 반짝 그리기 메시지 받음
+	case WM_DRAWSPARKLE:
+		DrawPolygonProcess(hWnd, hDCMem, wParam, lParam, g_serverDrawDetailInformation, MODE_SPARKLE);
+		return 0;
+
+	// 하트 그리기 메시지 받음
+	case WM_DRAWHEART:
+		DrawPolygonProcess(hWnd, hDCMem, wParam, lParam, g_serverDrawDetailInformation, MODE_HEART);
+		return 0;
+
+	// 부채꼴 그리기 메시지 받음
+	case WM_DRAWFANSHAPE:
+		DrawPolygonProcess(hWnd, hDCMem, wParam, lParam, g_serverDrawDetailInformation, MODE_FANSHAPE);
 		return 0;
 
 	//
@@ -1441,102 +1414,67 @@ DWORD WINAPI ReadThread(LPVOID arg)
 
 		// 사각형 그리기
 		case TYPE_DRAWRECTANGLE:
-			drawPolygon_msg = (DRAWPOLYGON_MSG*)&comm_msg;
-			g_serverDrawDetailInformation.width = drawPolygon_msg->width;
-			g_serverDrawDetailInformation.color = drawPolygon_msg->color;
-			SendMessage(g_hDrawWnd, WM_DRAWRECTANGLE,
-				MAKEWPARAM(drawPolygon_msg->startX, drawPolygon_msg->startY),
-				MAKELPARAM(drawPolygon_msg->endX, drawPolygon_msg->endY));
+			SendMessageShapeData(g_hDrawWnd, (DRAWPOLYGON_MSG*)&comm_msg, g_serverDrawDetailInformation, WM_DRAWRECTANGLE);
 			break;
 
 		// 삼각형 그리기
 		case TYPE_DRAWTRIANGLE:
-			drawPolygon_msg = (DRAWPOLYGON_MSG*)&comm_msg;
-			g_serverDrawDetailInformation.width = drawPolygon_msg->width;
-			g_serverDrawDetailInformation.color = drawPolygon_msg->color;
-			SendMessage(g_hDrawWnd, WM_DRAWTRIAGNGLE,
-				MAKEWPARAM(drawPolygon_msg->startX, drawPolygon_msg->startY),
-				MAKELPARAM(drawPolygon_msg->endX, drawPolygon_msg->endY));
+			SendMessageShapeData(g_hDrawWnd, (DRAWPOLYGON_MSG*)&comm_msg, g_serverDrawDetailInformation, WM_DRAWTRIAGNGLE);
 			break;
 		
 		// 직선 그리기
 		case TYPE_DRAWSTRAIGHT:
-			drawPolygon_msg = (DRAWPOLYGON_MSG*)&comm_msg;
-			g_serverDrawDetailInformation.width = drawPolygon_msg->width;
-			g_serverDrawDetailInformation.color = drawPolygon_msg->color;
-			SendMessage(g_hDrawWnd, WM_DRAWSTRAIGHT,
-				MAKEWPARAM(drawPolygon_msg->startX, drawPolygon_msg->startY),
-				MAKELPARAM(drawPolygon_msg->endX, drawPolygon_msg->endY));
+			SendMessageShapeData(g_hDrawWnd, (DRAWPOLYGON_MSG*)&comm_msg, g_serverDrawDetailInformation, WM_DRAWSTRAIGHT);
 			break;
 
 		// 오각형 그리기
 		case TYPE_DRAWPENTAGON:
-			drawPolygon_msg = (DRAWPOLYGON_MSG*)&comm_msg;
-			g_serverDrawDetailInformation.width = drawPolygon_msg->width;
-			g_serverDrawDetailInformation.color = drawPolygon_msg->color;
-			SendMessage(g_hDrawWnd, WM_DRAWPENTAGON,
-				MAKEWPARAM(drawPolygon_msg->startX, drawPolygon_msg->startY),
-				MAKELPARAM(drawPolygon_msg->endX, drawPolygon_msg->endY));
+			SendMessageShapeData(g_hDrawWnd, (DRAWPOLYGON_MSG*)&comm_msg, g_serverDrawDetailInformation, WM_DRAWPENTAGON);
 			break;
 
 		// 별 그리기
 		case TYPE_DRAWSTAR:
-			drawPolygon_msg = (DRAWPOLYGON_MSG*)&comm_msg;
-			g_serverDrawDetailInformation.width = drawPolygon_msg->width;
-			g_serverDrawDetailInformation.color = drawPolygon_msg->color;
-			SendMessage(g_hDrawWnd, WM_DRAWSTAR,
-				MAKEWPARAM(drawPolygon_msg->startX, drawPolygon_msg->startY),
-				MAKELPARAM(drawPolygon_msg->endX, drawPolygon_msg->endY));
+			SendMessageShapeData(g_hDrawWnd, (DRAWPOLYGON_MSG*)&comm_msg, g_serverDrawDetailInformation, WM_DRAWSTAR);
 			break;
 
 		// 사다리꼴 그리기
 		case TYPE_DRAWTRAPEZOID:
-			drawPolygon_msg = (DRAWPOLYGON_MSG*)&comm_msg;
-			g_serverDrawDetailInformation.width = drawPolygon_msg->width;
-			g_serverDrawDetailInformation.color = drawPolygon_msg->color;
-			SendMessage(g_hDrawWnd, WM_DRAWTRAPEZOID,
-				MAKEWPARAM(drawPolygon_msg->startX, drawPolygon_msg->startY),
-				MAKELPARAM(drawPolygon_msg->endX, drawPolygon_msg->endY));
+			SendMessageShapeData(g_hDrawWnd, (DRAWPOLYGON_MSG*)&comm_msg, g_serverDrawDetailInformation, WM_DRAWTRAPEZOID);
 			break;
 
 		// 밤톨 그리기
 		case TYPE_DRAWCHESTNUT:
-			drawPolygon_msg = (DRAWPOLYGON_MSG*)&comm_msg;
-			g_serverDrawDetailInformation.width = drawPolygon_msg->width;
-			g_serverDrawDetailInformation.color = drawPolygon_msg->color;
-			SendMessage(g_hDrawWnd, WM_DRAWCHESTNUT,
-				MAKEWPARAM(drawPolygon_msg->startX, drawPolygon_msg->startY),
-				MAKELPARAM(drawPolygon_msg->endX, drawPolygon_msg->endY));
+			SendMessageShapeData(g_hDrawWnd, (DRAWPOLYGON_MSG*)&comm_msg, g_serverDrawDetailInformation, WM_DRAWCHESTNUT);
 			break;
 
 		// 평행사변형 그리기
 		case TYPE_DRAWPARALLELOGRAM:
-			drawPolygon_msg = (DRAWPOLYGON_MSG*)&comm_msg;
-			g_serverDrawDetailInformation.width = drawPolygon_msg->width;
-			g_serverDrawDetailInformation.color = drawPolygon_msg->color;
-			SendMessage(g_hDrawWnd, WM_DRAWPARALLELOGRAM,
-				MAKEWPARAM(drawPolygon_msg->startX, drawPolygon_msg->startY),
-				MAKELPARAM(drawPolygon_msg->endX, drawPolygon_msg->endY));
+			SendMessageShapeData(g_hDrawWnd, (DRAWPOLYGON_MSG*)&comm_msg, g_serverDrawDetailInformation, WM_DRAWPARALLELOGRAM);
 			break;
 
 		// 마름모 그리기
 		case TYPE_DRAWDIAMOND:
-			drawPolygon_msg = (DRAWPOLYGON_MSG*)&comm_msg;
-			g_serverDrawDetailInformation.width = drawPolygon_msg->width;
-			g_serverDrawDetailInformation.color = drawPolygon_msg->color;
-			SendMessage(g_hDrawWnd, WM_DRAWDIAMOND,
-				MAKEWPARAM(drawPolygon_msg->startX, drawPolygon_msg->startY),
-				MAKELPARAM(drawPolygon_msg->endX, drawPolygon_msg->endY));
+			SendMessageShapeData(g_hDrawWnd, (DRAWPOLYGON_MSG*)&comm_msg, g_serverDrawDetailInformation, WM_DRAWDIAMOND);
 			break;
 
 		// 화살표 그리기
 		case TYPE_DRAWARROW:
-			drawPolygon_msg = (DRAWPOLYGON_MSG*)&comm_msg;
-			g_serverDrawDetailInformation.width = drawPolygon_msg->width;
-			g_serverDrawDetailInformation.color = drawPolygon_msg->color;
-			SendMessage(g_hDrawWnd, WM_DRAWARROW,
-				MAKEWPARAM(drawPolygon_msg->startX, drawPolygon_msg->startY),
-				MAKELPARAM(drawPolygon_msg->endX, drawPolygon_msg->endY));
+			SendMessageShapeData(g_hDrawWnd, (DRAWPOLYGON_MSG*)&comm_msg, g_serverDrawDetailInformation, WM_DRAWARROW);
+			break;
+
+		// 반짝 그리기
+		case TYPE_DRAWSPARKLE:
+			SendMessageShapeData(g_hDrawWnd, (DRAWPOLYGON_MSG*)&comm_msg, g_serverDrawDetailInformation, WM_DRAWSPARKLE);
+			break;
+
+		// 하트 그리기
+		case TYPE_DRAWHEART:
+			SendMessageShapeData(g_hDrawWnd, (DRAWPOLYGON_MSG*)&comm_msg, g_serverDrawDetailInformation, WM_DRAWHEART);
+			break;
+
+		// 부채꼴 그리기
+		case TYPE_DRAWFANSHAPE:
+			SendMessageShapeData(g_hDrawWnd, (DRAWPOLYGON_MSG*)&comm_msg, g_serverDrawDetailInformation, WM_DRAWFANSHAPE);
 			break;
 
 		case TYPE_ERASEPIC:

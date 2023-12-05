@@ -101,6 +101,9 @@ void AddFigureOption(HWND hDlg)
 	SendDlgItemMessage(hDlg, IDC_FIGURE, CB_ADDSTRING, 0, (LPARAM)_T("평행사변형"));
 	SendDlgItemMessage(hDlg, IDC_FIGURE, CB_ADDSTRING, 0, (LPARAM)_T("마름모"));
 	SendDlgItemMessage(hDlg, IDC_FIGURE, CB_ADDSTRING, 0, (LPARAM)_T("화살표"));
+	/*SendDlgItemMessage(hDlg, IDC_FIGURE, CB_ADDSTRING, 0, (LPARAM)_T("반짝"));
+	SendDlgItemMessage(hDlg, IDC_FIGURE, CB_ADDSTRING, 0, (LPARAM)_T("하트"));
+	SendDlgItemMessage(hDlg, IDC_FIGURE, CB_ADDSTRING, 0, (LPARAM)_T("부채꼴"));*/
 
 	// 초기 도형 옵션은 "선"으로 설정 
 	SendDlgItemMessage(hDlg, IDC_FIGURE, CB_SETCURSEL, 1, 0);
@@ -164,6 +167,18 @@ void SelectFigureOption(HWND hDlg, int &g_currentSelectFigureOption)
 	// "화살표" 모드 선택
 	case 12:
 		g_currentSelectFigureOption = MODE_ARROW;
+		break;
+	// "반짝" 모드 선택
+	case 13:
+		g_currentSelectFigureOption = MODE_SPARKLE;
+		break;
+	// "하트" 모드 선택
+	case 14:
+		g_currentSelectFigureOption = MODE_HEART;
+		break;
+	// "부채꼴" 모드 선택
+	case 15:
+		g_currentSelectFigureOption = MODE_FANSHAPE;
 		break;
 	}
 }
@@ -351,6 +366,18 @@ void DrawPolygonInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam, int type)
 	case MODE_ARROW:
 		DrawArrowInHDC(tHDC, wParam, lParam);
 		break;
+
+	case MODE_SPARKLE:
+		DrawSparkleInHDC(tHDC, wParam, lParam);
+		break;
+
+	case MODE_HEART:
+		DrawHeartInHDC(tHDC, wParam, lParam);
+		break;
+
+	case MODE_FANSHAPE:
+		DrawFanshapeInHDC(tHDC, wParam, lParam);
+		break;
 	}
 }
 
@@ -533,4 +560,142 @@ void DrawArrowInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam)
 	DrawLineInHDC(tHDC, MAKEWPARAM(startX + (endX - startX) / 4 * 3, endY), MAKELPARAM(startX + (endX - startX) / 4 * 3, startY + (endY - startY) / 4 * 3));
 	DrawLineInHDC(tHDC, MAKEWPARAM(startX + (endX - startX) / 4 * 3, startY + (endY - startY) / 4 * 3), MAKELPARAM(startX, startY + (endY - startY) / 4 * 3));
 	DrawLineInHDC(tHDC, MAKEWPARAM(startX, startY + (endY - startY) / 4 * 3), MAKELPARAM(startX, startY + (endY - startY) / 4));
+}
+
+// 반짝을 특정 HDC에 그림
+void DrawSparkleInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam)
+{
+	// 시작과 끝점
+	int startX = LOWORD(wParam);
+	int startY = HIWORD(wParam);
+	int endX = LOWORD(lParam);
+	int endY = HIWORD(lParam);
+
+	int centerX = (startX + endX) / 2;
+	int centerY = (startY + endY) / 2;
+	int radius = centerX - startX;
+
+	int** positions;
+	GetPositionByPoints(positions, 4, centerX, centerY, radius / 2, 15);
+
+	// 반짝 그리기
+	DrawLineInHDC(tHDC, MAKEWPARAM(centerX, startY), MAKELPARAM(positions[3][1], positions[3][0]));
+	DrawLineInHDC(tHDC, MAKEWPARAM(positions[3][1], positions[3][0]), MAKELPARAM(endX, centerY));
+	DrawLineInHDC(tHDC, MAKEWPARAM(endX, centerY), MAKELPARAM(positions[0][1], positions[0][0]));
+	DrawLineInHDC(tHDC, MAKEWPARAM(positions[0][1], positions[0][0]), MAKELPARAM(centerX, endY));
+	DrawLineInHDC(tHDC, MAKEWPARAM(centerX, endY), MAKELPARAM(positions[1][1], positions[1][0]));
+	DrawLineInHDC(tHDC, MAKEWPARAM(positions[1][1], positions[1][0]), MAKELPARAM(startX, centerY));
+	DrawLineInHDC(tHDC, MAKEWPARAM(startX, centerY), MAKELPARAM(positions[2][1], positions[2][0]));
+	DrawLineInHDC(tHDC, MAKEWPARAM(positions[2][1], positions[2][0]), MAKELPARAM(centerX, startY));
+
+	free(positions);
+}
+
+// 하트를 특정 HDC에 그림
+void DrawHeartInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam)
+{
+	// 시작과 끝점
+	int startX = LOWORD(wParam);
+	int startY = HIWORD(wParam);
+	int endX = LOWORD(lParam);
+	int endY = HIWORD(lParam);
+
+	int centerX = (startX + endX) / 2;
+	int centerY = (startY + endY) / 2;
+	int radius = (centerX - startX) / 2;
+
+	// 하트 그리기
+	DrawLineInHDC(tHDC, MAKEWPARAM(endX, centerY), MAKELPARAM(centerX, endY));
+	DrawLineInHDC(tHDC, MAKEWPARAM(centerX, endY), MAKELPARAM(startX, centerY));
+
+	// 시작 위치
+	int oldX = startX;
+	int oldY = centerY;
+
+	int newX, newY, angle;
+
+	// 1도씩 회전하면서 반원을 2개 그리기
+	for (int i = 0; i <= 90; i++)
+	{
+		// 타원 공식 적용
+		angle = 2 * PI * i / 360;
+		newX = (startX + radius) + radius * cos(angle);
+		newY = centerY + radius * sin(angle);
+
+		// 첫 번째는 같은 지점을 찍으므로 무시
+		if (i != 0)
+		{
+			DrawLineInHDC(tHDC, MAKEWPARAM(oldX, oldY), MAKELPARAM(newX, newY));
+			DrawLineInHDC(tHDC, MAKEWPARAM(oldX + radius * 2, oldY), MAKELPARAM(newX + radius * 2, newY));
+		}
+
+		// 종료 위치를 다시 시작 위치로 옮김.
+		oldX = newX;
+		oldY = newY;
+	}
+}
+
+// 부채꼴을 특정 HDC에 그림
+void DrawFanshapeInHDC(HDC tHDC, WPARAM wParam, LPARAM lParam)
+{
+	// 시작과 끝점
+	int startX = LOWORD(wParam);
+	int startY = HIWORD(wParam);
+	int endX = LOWORD(lParam);
+	int endY = HIWORD(lParam);
+
+	int centerX = (startX + endX) / 2;
+	int centerY = (startY + endY) / 2;
+	int radius = sqrt((centerX - startX) * (centerX - startX) + (centerY - endY) * (centerY - endY));
+
+	// 부채꼴 그리기
+	DrawLineInHDC(tHDC, MAKEWPARAM(endX, centerY), MAKELPARAM(centerX, endY));
+	DrawLineInHDC(tHDC, MAKEWPARAM(centerX, endY), MAKELPARAM(startX, centerY));
+
+	// 시작 위치
+	int oldX = startX;
+	int oldY = centerY;
+
+	int newX, newY, angle;
+
+	// 1도씩 회전하면서 반원 그리기
+	for (int i = 0; i <= 45; i++)
+	{
+		// 타원 공식 적용
+		angle = 2 * PI * i / 360;
+		newX = (startX + radius) + radius * cos(angle);
+		newY = centerY + radius * sin(angle);
+
+		// 첫 번째는 같은 지점을 찍으므로 무시
+		if (i != 0)
+		{
+			DrawLineInHDC(tHDC, MAKEWPARAM(oldX, oldY), MAKELPARAM(newX, newY));
+		}
+
+		// 종료 위치를 다시 시작 위치로 옮김.
+		oldX = newX;
+		oldY = newY;
+	}
+}
+
+// 도형 전송 데이터 형식 만들기
+void ShapeDataInput(DRAWPOLYGON_MSG& drawpolygon_msg, int type, int startX, int startY, LPARAM lParam, DRAW_DETAIL_INFORMATION DDinfo)
+{
+	drawpolygon_msg.type = type;
+	drawpolygon_msg.startX = startX;
+	drawpolygon_msg.startY = startY;
+	drawpolygon_msg.endX = LOWORD(lParam);
+	drawpolygon_msg.endY = HIWORD(lParam);
+	drawpolygon_msg.color = DDinfo.color;
+	drawpolygon_msg.width = DDinfo.width;
+}
+
+// 도형 데이터 메시지 전송
+void SendMessageShapeData(HWND hDrawWnd, DRAWPOLYGON_MSG* DP_Msg, DRAW_DETAIL_INFORMATION &DDinfo, int WM_Drawtype)
+{
+	DDinfo.width = DP_Msg->width;
+	DDinfo.color = DP_Msg->color;
+	SendMessage(hDrawWnd, WM_Drawtype,
+		MAKEWPARAM(DP_Msg->startX, DP_Msg->startY),
+		MAKELPARAM(DP_Msg->endX, DP_Msg->endY));
 }
