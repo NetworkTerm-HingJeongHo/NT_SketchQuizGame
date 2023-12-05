@@ -149,18 +149,17 @@ int main(int argc, char* argv[])
 	return 0;
 }
 
-// ======= 정호 =======
+
 // 윈도우 메시지 처리
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg) {
-		// =========== 지윤 ============
+	// ================= 지윤 ================= 
 	case WM_CREATE:
 		/* 클라이언트 목록 */
 		InitializeListView(hWnd);
 		CreateWindow(_T("BUTTON"), _T("사용자 강제퇴장"), WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
 			10, 220, 200, 30, hWnd, (HMENU)CLIENTOUT, NULL, NULL);
-
 		/* 채팅 데이터 */
 		InitializeChatListView(hWnd);
 		return 0;
@@ -187,13 +186,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			g_selectedIndex = pnmia->iItem;
 		}
 		return 0;
-		// =============================
+	// ============ 정호 ============
 	case WM_SOCKET: // 소켓 관련 윈도우 메시지
 		ProcessSocketMessage(hWnd, uMsg, wParam, lParam);
 		return 0;
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		return 0;
+	// ==============================
 	}
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
@@ -201,7 +201,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 // 소켓 관련 윈도우 메시지 처리
 void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-
 	//FILE* fd;
 	// 데이터 통신에 사용할 변수
 	SOCKETINFO* ptr;
