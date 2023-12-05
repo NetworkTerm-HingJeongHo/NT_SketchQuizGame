@@ -265,7 +265,7 @@ INT_PTR CALLBACK DlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			//SetEvent(g_hWriteEvent);
 			//isMessageQueue = TRUE;
 			// 이전에 얻은 채팅 메시지 읽기 완료를 기다림
-			roundNum += 1;
+			//roundNum += 1;
 			EnableWindow(hBtnGameStart, TRUE);
 			// 이전에 얻은 채팅 메시지 읽기 완료를 기다림
 			WaitForSingleObject(g_hReadEvent, INFINITE);
@@ -1338,7 +1338,7 @@ DWORD WINAPI ReadThread(LPVOID arg)
 		//	continue;
 		//}
 		retval = recvn(g_sock, (char*)&comm_msg, BUFSIZE, 0, serveraddr, g_isUDP);
-
+		char wBuf[256];
 		char selectedName[256];
 		char roundText[20];
 		if (retval == 0 || retval == SOCKET_ERROR) {
@@ -1373,11 +1373,15 @@ DWORD WINAPI ReadThread(LPVOID arg)
 			chat_msg = (CHAT_MSG*)&comm_msg;
 			sscanf(chat_msg->msg, "{%[^}]%*s%s", senderName, sendMsg);
 
-			if (strncmp(sendMsg, "/w ", 3) == 0) {
-				sscanf(sendMsg, "%s %s %s", tmp, sender, reciever);
+			if (strncmp(sendMsg, "/w", 2) == 0) {
+				sscanf(chat_msg->msg, "%s %s %s", tmp, tmp, reciever);
 				if (strcmp(reciever, NICKNAME_CHAR) == 0) {
-					MySendFile(sender, reciever, chat_msg->msg);
+					MySendFile(senderName, reciever, chat_msg->msg);
 					DisplayText("%s\r\n", chat_msg->msg);
+					DisplayText("[%s]님으로부터 쪽지를 받았습니다!", senderName);
+				}
+				if (strcmp(senderName, NICKNAME_CHAR) == 0) {
+					DisplayText("[%s]님에게 쪽지를 보냈습니다!", reciever);
 				}
 			}
 			else {
@@ -1401,6 +1405,7 @@ DWORD WINAPI ReadThread(LPVOID arg)
 			DisplayText("%s\r\n", chat_msg->msg);
 			break;
 		case TYPE_START:
+
 		case TYPE_NOTY:
 			chat_msg = (CHAT_MSG*)&comm_msg;
 			DisplayText("%s\r\n", chat_msg->msg);
@@ -1410,6 +1415,7 @@ DWORD WINAPI ReadThread(LPVOID arg)
 				isGameOver = TRUE;
 				break;
 			}
+			roundNum += 1;
 			strcpy(selectedName, comm_msg.dummy);
 			_TCHAR selectedName_T[BUFSIZE];
 			MultiByteToWideChar(CP_ACP, 0, selectedName, -1, selectedName_T, BUFSIZE);

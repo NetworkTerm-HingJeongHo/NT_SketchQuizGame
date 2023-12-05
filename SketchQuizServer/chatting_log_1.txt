@@ -4,3 +4,11 @@
 {asdf} aaaaaaa
 {asdf} gggggggggggg
 {asdf} asdfsadfsadfsadf{aaaa} aaaaa
+{지안} /w 지안 asdf 귓속말을 보내는 중입니다
+{연경} /w 연경 지안 귓속말보내기
+{연경} /w 지안 귓속말보내기
+{asdf} /w dd 귓말테스트
+{연경} /w 지안 귓말 테스트
+{asdf} /w 연경 ㅁㅁㅁ
+{aaa} /w lkj asdf asd;lfk jsdf
+{연경} /w 지안 귓말 테스트
