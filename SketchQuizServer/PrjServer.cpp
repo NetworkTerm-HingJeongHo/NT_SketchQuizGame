@@ -2,8 +2,8 @@
 
 int main(int argc, char* argv[])
 {
-	// ========= ì •í˜¸ ========
-	// ìœˆë„ìš° í´ë˜ìŠ¤ ë“±ë¡
+	// ========= Á¤È£ ========
+	// À©µµ¿ì Å¬·¡½º µî·Ï
 	WNDCLASS wndclass;
 	wndclass.style = CS_HREDRAW | CS_VREDRAW;
 	wndclass.lpfnWndProc = WndProc;
@@ -17,8 +17,8 @@ int main(int argc, char* argv[])
 	wndclass.lpszClassName = _T("MyWndClass");
 	if (!RegisterClass(&wndclass)) return 1;
 
-	// ì„ì‹œ ìœˆë„ìš° ìƒì„±
-	HWND hWnd = CreateWindow(_T("MyWndClass"), _T("TCP ì„œë²„"), WS_OVERLAPPEDWINDOW,
+	// ÀÓ½Ã À©µµ¿ì »ı¼º
+	HWND hWnd = CreateWindow(_T("MyWndClass"), _T("TCP ¼­¹ö"), WS_OVERLAPPEDWINDOW,
 		0, 0, 600, 300, NULL, NULL, NULL, NULL);
 	if (hWnd == NULL) return 1;
 	ShowWindow(hWnd, SW_SHOWNORMAL);
@@ -26,13 +26,13 @@ int main(int argc, char* argv[])
 
 	int retval;
 
-	// ìœˆì† ì´ˆê¸°í™”
+	// À©¼Ó ÃÊ±âÈ­
 	WSADATA wsa;
 	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
 		return 1;
 
-	/*----- TCP/IPv4 ì†Œì¼“ ì´ˆê¸°í™” ì‹œì‘ -----*/
-	// ì†Œì¼“ ìƒì„±
+	/*----- TCP/IPv4 ¼ÒÄÏ ÃÊ±âÈ­ ½ÃÀÛ -----*/
+	// ¼ÒÄÏ »ı¼º
 	listen_sock4 = socket(AF_INET, SOCK_STREAM, 0);
 	if (listen_sock4 == INVALID_SOCKET) err_quit("socket()");
 
@@ -41,7 +41,7 @@ int main(int argc, char* argv[])
 	serveraddr.sin_family = AF_INET;
 	serveraddr.sin_addr.s_addr = htonl(INADDR_ANY);
 	serveraddr.sin_port = htons(SERVERPORT);
-	retval = bind(listen_sock4, (struct sockaddr *)&serveraddr,
+	retval = bind(listen_sock4, (struct sockaddr*)&serveraddr,
 		sizeof(serveraddr));
 	if (retval == SOCKET_ERROR) err_quit("bind()");
 
@@ -49,16 +49,16 @@ int main(int argc, char* argv[])
 	retval = listen(listen_sock4, SOMAXCONN);
 	if (retval == SOCKET_ERROR) err_quit("listen()");
 
-	// TCP/IPv4 ì†Œì¼“ì— ë…¼ë¸”ë¡œí‚¹ ëª¨ë“œ ì„¤ì •
+	// TCP/IPv4 ¼ÒÄÏ¿¡ ³íºí·ÎÅ· ¸ğµå ¼³Á¤
 	u_long nonBlockingModeOn = 1;
 	retval = ioctlsocket(listen_sock4, FIONBIO, &nonBlockingModeOn);
 	if (retval == SOCKET_ERROR) {
 		err_quit("ioctlsocket()");
 	}
-	/*----- TCP/IPv4 ì†Œì¼“ ì´ˆê¸°í™” ì¢…ë£Œ -----*/
+	/*----- TCP/IPv4 ¼ÒÄÏ ÃÊ±âÈ­ Á¾·á -----*/
 
-	 /*----- UDP/IPv4 ì†Œì¼“ ì´ˆê¸°í™” ì‹œì‘ -----*/
-   // TODO: ì†Œì¼“ì„ ìƒì„±í•˜ê³  ì´ˆê¸°í™”í•œë‹¤. == ì •í˜¸ ==
+	 /*----- UDP/IPv4 ¼ÒÄÏ ÃÊ±âÈ­ ½ÃÀÛ -----*/
+   // TODO: ¼ÒÄÏÀ» »ı¼ºÇÏ°í ÃÊ±âÈ­ÇÑ´Ù. == Á¤È£ ==
 
 	socket_UDP = socket(AF_INET, SOCK_DGRAM, 0);
 	if (socket_UDP == INVALID_SOCKET)
@@ -66,24 +66,24 @@ int main(int argc, char* argv[])
 		err_quit("socket()");
 	}
 
-	// ë©€í‹°ìºìŠ¤íŠ¸ ê·¸ë£¹ ê°€ì…
+	// ¸ÖÆ¼Ä³½ºÆ® ±×·ì °¡ÀÔ
 	struct ip_mreq mreq1;
-	inet_pton(AF_INET, SERVERIP4_CHAR_UDP1, &mreq1.imr_multiaddr.s_addr); // ê°€ì…í•˜ê±°ë‚˜ íƒˆí‡´í•  IPv4 ë©€í‹°ì¼€ìŠ¤íŠ¸ address(ì£¼ì†Œ) (ê°€ì…í•  ë™ì•„ë¦¬)
-	mreq1.imr_interface.s_addr = htonl(INADDR_ANY);      // ë¡œì»¬ ip address (ë‚˜)
+	inet_pton(AF_INET, SERVERIP4_CHAR_UDP1, &mreq1.imr_multiaddr.s_addr); // °¡ÀÔÇÏ°Å³ª Å»ÅğÇÒ IPv4 ¸ÖÆ¼ÄÉ½ºÆ® address(ÁÖ¼Ò) (°¡ÀÔÇÒ µ¿¾Æ¸®)
+	mreq1.imr_interface.s_addr = htonl(INADDR_ANY);      // ·ÎÄÃ ip address (³ª)
 	retval = setsockopt(socket_UDP, IPPROTO_IP, IP_ADD_MEMBERSHIP,
 		(char*)&mreq1, sizeof(mreq1));
 	if (retval == SOCKET_ERROR) err_quit("setsockopt() 1");
 
-	// ë©€í‹°ìºìŠ¤íŠ¸ ê·¸ë£¹ ê°€ì…
+	// ¸ÖÆ¼Ä³½ºÆ® ±×·ì °¡ÀÔ
 	struct ip_mreq mreq2;
-	inet_pton(AF_INET, SERVERIP4_CHAR_UDP2, &mreq2.imr_multiaddr.s_addr); // ê°€ì…í•˜ê±°ë‚˜ íƒˆí‡´í•  IPv4 ë©€í‹°ì¼€ìŠ¤íŠ¸ address(ì£¼ì†Œ) (ê°€ì…í•  ë™ì•„ë¦¬)
+	inet_pton(AF_INET, SERVERIP4_CHAR_UDP2, &mreq2.imr_multiaddr.s_addr); // °¡ÀÔÇÏ°Å³ª Å»ÅğÇÒ IPv4 ¸ÖÆ¼ÄÉ½ºÆ® address(ÁÖ¼Ò) (°¡ÀÔÇÒ µ¿¾Æ¸®)
 	mreq2.imr_interface.s_addr = htonl(INADDR_ANY);
 	retval = setsockopt(socket_UDP, IPPROTO_IP, IP_ADD_MEMBERSHIP,
 		(char*)&mreq2, sizeof(mreq2));
 	if (retval == SOCKET_ERROR) err_quit("setsockopt() 2");
 
-	// ---------------- ì§€ì•ˆ ---------------- //
-	// bind() UDP ê·¸ë£¹ B bind
+	// ---------------- Áö¾È ---------------- //
+	// bind() UDP ±×·ì B bind
 
 	retval = bind(socket_UDP, (SOCKADDR*)&serveraddr, sizeof(serveraddr));
 	if (retval == SOCKET_ERROR) err_quit("bind()");
@@ -91,34 +91,34 @@ int main(int argc, char* argv[])
 	// --------------------------------------- //
 
 
-	/*----- UDP/IPv4 ì†Œì¼“ ì´ˆê¸°í™” ì¢…ë£Œ -----*/
+	/*----- UDP/IPv4 ¼ÒÄÏ ÃÊ±âÈ­ Á¾·á -----*/
 
-	/*----- UDP/IPv6 ì†Œì¼“ ì´ˆê¸°í™” ì‹œì‘ -----*/
-	// TODO: ì†Œì¼“ì„ ìƒì„±í•˜ê³  ì´ˆê¸°í™”í•œë‹¤.
-	/*----- UDP/IPv6 ì†Œì¼“ ì´ˆê¸°í™” ì¢…ë£Œ -----*/
+	/*----- UDP/IPv6 ¼ÒÄÏ ÃÊ±âÈ­ ½ÃÀÛ -----*/
+	// TODO: ¼ÒÄÏÀ» »ı¼ºÇÏ°í ÃÊ±âÈ­ÇÑ´Ù.
+	/*----- UDP/IPv6 ¼ÒÄÏ ÃÊ±âÈ­ Á¾·á -----*/
 
-	// ë°ì´í„° í†µì‹ ì— ì‚¬ìš©í•  ë³€ìˆ˜(ê³µí†µ)
+	// µ¥ÀÌÅÍ Åë½Å¿¡ »ç¿ëÇÒ º¯¼ö(°øÅë)
 	fd_set rset;
 	SOCKET client_sock;
 	int addrlen;
-	// ë°ì´í„° í†µì‹ ì— ì‚¬ìš©í•  ë³€ìˆ˜(IPv4)
+	// µ¥ÀÌÅÍ Åë½Å¿¡ »ç¿ëÇÒ º¯¼ö(IPv4)
 	struct sockaddr_in clientaddr4;
-	// ë°ì´í„° í†µì‹ ì— ì‚¬ìš©í•  ë³€ìˆ˜(IPv6)
+	// µ¥ÀÌÅÍ Åë½Å¿¡ »ç¿ëÇÒ º¯¼ö(IPv6)
 	struct sockaddr_in6 clientaddr6;
-	
-	// ========== ì •í˜¸ ==========
-	int recvLen; // ë°›ì€ ê°€ë³€ ë°ì´í„° í¬ê¸°
-	int sendLen; // ë³´ë‚¼ ê°€ë³€ ë°ì´í„° í¬ê¸°
+
+	// ========== Á¤È£ ==========
+	int recvLen; // ¹ŞÀº °¡º¯ µ¥ÀÌÅÍ Å©±â
+	int sendLen; // º¸³¾ °¡º¯ µ¥ÀÌÅÍ Å©±â
 
 	// WSAAsyncSelect()
 
-	// TCPëŠ” ì—°ê²°ì„ í•´ì•¼í•˜ë¯€ë¡œ FD_ACCEPTë¥¼ ì¶”ê°€
+	// TCP´Â ¿¬°áÀ» ÇØ¾ßÇÏ¹Ç·Î FD_ACCEPT¸¦ Ãß°¡
 	retval = WSAAsyncSelect(listen_sock4, hWnd, WM_SOCKET, FD_ACCEPT | FD_CLOSE);
 	if (retval == SOCKET_ERROR) err_quit("WSAAsyncSelect()");
 
-	// UDPëŠ” TCPì™€ ë‹¬ë¦¬ ì—°ê²°ì´ í•„ìš”ì—†ìœ¼ë¯€ë¡œ
-	// FD_ACCEPTë¥¼ í•˜ì§€ ì•ŠìŒ.
-	// FD_READë¡œ ë°ì´í„°ë¥¼ ìˆ˜ì‹ í•  ìˆ˜ ìˆë„ë¡ ì„¤ì •
+	// UDP´Â TCP¿Í ´Ş¸® ¿¬°áÀÌ ÇÊ¿ä¾øÀ¸¹Ç·Î
+	// FD_ACCEPT¸¦ ÇÏÁö ¾ÊÀ½.
+	// FD_READ·Î µ¥ÀÌÅÍ¸¦ ¼ö½ÅÇÒ ¼ö ÀÖµµ·Ï ¼³Á¤
 	retval = WSAAsyncSelect(socket_UDP, hWnd, WM_SOCKET, FD_READ | FD_CLOSE);
 	if (retval == SOCKET_ERROR) err_quit("WSAAsyncSelect()");
 
@@ -128,23 +128,23 @@ int main(int argc, char* argv[])
 		DispatchMessage(&msg);
 	}
 
-	// ìœˆì† ì¢…ë£Œ
+	// À©¼Ó Á¾·á
 	WSACleanup();
 	return 0;
 }
 
 
-// ìœˆë„ìš° ë©”ì‹œì§€ ì²˜ë¦¬
+// À©µµ¿ì ¸Ş½ÃÁö Ã³¸®
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg) {
-	// ================= ì§€ìœ¤ ================= 
+		// ================= ÁöÀ± ================= 
 	case WM_CREATE:
-		/* í´ë¼ì´ì–¸íŠ¸ ëª©ë¡ */
+		/* Å¬¶óÀÌ¾ğÆ® ¸ñ·Ï */
 		InitializeListView(hWnd);
-		CreateWindow(_T("BUTTON"), _T("ì‚¬ìš©ì ê°•ì œí‡´ì¥"), WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
+		CreateWindow(_T("BUTTON"), _T("»ç¿ëÀÚ °­Á¦ÅğÀå"), WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
 			10, 220, 200, 30, hWnd, (HMENU)CLIENTOUT, NULL, NULL);
-		/* ì±„íŒ… ë°ì´í„° */
+		/* Ã¤ÆÃ µ¥ÀÌÅÍ */
 		InitializeChatListView(hWnd);
 		return 0;
 	case WM_COMMAND:
@@ -152,12 +152,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 		case CLIENTOUT:
 			if (g_selectedIndex != -1) {
-				// ì„ íƒí•œ í´ë¼ì´ì–¸íŠ¸ë¥¼ ì œê±°í•˜ëŠ” ì½”ë“œ ì¶”ê°€
+				// ¼±ÅÃÇÑ Å¬¶óÀÌ¾ğÆ®¸¦ Á¦°ÅÇÏ´Â ÄÚµå Ãß°¡
 				int portToRemove = g_selectedIndex;
 				RemoveClientFromListView(portToRemove);
 				RemoveSocketByPort(portToRemove);
 
-				// ì„ íƒì„ í•´ì œí•˜ê³  g_selectedIndexë¥¼ ì´ˆê¸°í™”
+				// ¼±ÅÃÀ» ÇØÁ¦ÇÏ°í g_selectedIndex¸¦ ÃÊ±âÈ­
 				ListView_SetItemState(g_hListView, g_selectedIndex, 0, LVIS_SELECTED);
 				g_selectedIndex = -1;
 			}
@@ -166,44 +166,47 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		return 0;
 	case WM_NOTIFY:
 		if (((LPNMHDR)lParam)->code == NM_CLICK) {
-			// ListViewì—ì„œ í´ë¦­ ì´ë²¤íŠ¸ë¥¼ ì²˜ë¦¬í•˜ì—¬ ì„ íƒí•œ í´ë¼ì´ì–¸íŠ¸ì˜ ì¸ë±ìŠ¤ë¥¼ ì €ì¥
+			// ListView¿¡¼­ Å¬¸¯ ÀÌº¥Æ®¸¦ Ã³¸®ÇÏ¿© ¼±ÅÃÇÑ Å¬¶óÀÌ¾ğÆ®ÀÇ ÀÎµ¦½º¸¦ ÀúÀå
 			NMITEMACTIVATE* pnmia = (NMITEMACTIVATE*)lParam;
 			g_selectedIndex = pnmia->iItem;
 		}
 		return 0;
-	// ============ ì •í˜¸ ============
-	case WM_SOCKET: // ì†Œì¼“ ê´€ë ¨ ìœˆë„ìš° ë©”ì‹œì§€
+		// ============ Á¤È£ ============
+	case WM_SOCKET: // ¼ÒÄÏ °ü·Ã À©µµ¿ì ¸Ş½ÃÁö
 		ProcessSocketMessage(hWnd, uMsg, wParam, lParam);
 		return 0;
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		return 0;
-	// ==============================
+		// ==============================
 	}
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
 
-// ì†Œì¼“ ê´€ë ¨ ìœˆë„ìš° ë©”ì‹œì§€ ì²˜ë¦¬
+// ¼ÒÄÏ °ü·Ã À©µµ¿ì ¸Ş½ÃÁö Ã³¸®
 void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	//FILE* fd;
-	// ë°ì´í„° í†µì‹ ì— ì‚¬ìš©í•  ë³€ìˆ˜
+	// µ¥ÀÌÅÍ Åë½Å¿¡ »ç¿ëÇÒ º¯¼ö
 	SOCKETINFO* ptr;
 	SOCKET client_sock;
 	SOCKADDR_IN clientaddr;
 	int addrlen, retval;
 	char buf[BUFSIZE + 1];
 
-	// ì˜¤ë¥˜ ë°œìƒ ì—¬ë¶€ í™•ì¸
+	// === Á¤È£ ===
+	int groupNumUDP = 0;
+
+	// ¿À·ù ¹ß»ı ¿©ºÎ È®ÀÎ
 	if (WSAGETSELECTERROR(lParam)) {
 		err_display(WSAGETSELECTERROR(lParam));
 		RemoveSocketInfo(wParam);
 		return;
 	}
 
-	// ë©”ì‹œì§€ ì²˜ë¦¬
+	// ¸Ş½ÃÁö Ã³¸®
 	switch (WSAGETSELECTEVENT(lParam)) {
-	// ì ‘ì†
+		// Á¢¼Ó
 	case FD_ACCEPT:
 		addrlen = sizeof(clientaddr);
 		client_sock = accept(listen_sock4, (SOCKADDR*)&clientaddr, &addrlen);
@@ -212,11 +215,11 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			return;
 		}
 		else {
-			// ì ‘ì†í•œ í´ë¼ì´ì–¸íŠ¸ ì •ë³´ ì¶œë ¥
-			printf("\n[TCP/IPv4 ì„œë²„] í´ë¼ì´ì–¸íŠ¸ ì ‘ì†: IP ì£¼ì†Œ=%s, í¬íŠ¸ ë²ˆí˜¸=%d\n", 
+			// Á¢¼ÓÇÑ Å¬¶óÀÌ¾ğÆ® Á¤º¸ Ãâ·Â
+			printf("\n[TCP/IPv4 ¼­¹ö] Å¬¶óÀÌ¾ğÆ® Á¢¼Ó: IP ÁÖ¼Ò=%s, Æ÷Æ® ¹øÈ£=%d\n",
 				inet_ntoa(clientaddr.sin_addr), ntohs(clientaddr.sin_port));
-			
-			// ì†Œì¼“ ì •ë³´ ì¶”ê°€
+
+			// ¼ÒÄÏ Á¤º¸ Ãß°¡
 			AddSocketInfoTCP(client_sock);
 			retval = WSAAsyncSelect(client_sock, hWnd,
 				WM_SOCKET, FD_READ | FD_WRITE | FD_CLOSE);
@@ -236,75 +239,75 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			//	printf("no");
 			//	return;
 			//}
-			// ê³ ì • ë°ì´í„° ë°›ê¸°
+			// °íÁ¤ µ¥ÀÌÅÍ ¹Ş±â
 			retval = recv(ptr->sock, ptr->buf, BUFSIZE, 0);
-			// ============================== ì§€ì•ˆ ================================//
-			// COMM_MSG íƒ€ì…ìœ¼ë¡œ í˜•ë³€í™˜ (ê¸°ë³´íƒ€ì…) -> êµ¬ì¡°ì²´ typeì„ ì–»ì–´ë‚´ê¸° ìœ„í•¨ì´ë‹¤.
+			// ============================== Áö¾È ================================//
+			// COMM_MSG Å¸ÀÔÀ¸·Î Çüº¯È¯ (±âº¸Å¸ÀÔ) -> ±¸Á¶Ã¼ typeÀ» ¾ò¾î³»±â À§ÇÔÀÌ´Ù.
 			COMM_MSG* comm_msg;
 			comm_msg = (COMM_MSG*)&(ptr->buf);
-			printf("[COMM_MSG type] %d\n", comm_msg->type); //ì–»ì€ type ì¶œë ¥
+			printf("[COMM_MSG type] %d\n", comm_msg->type); //¾òÀº type Ãâ·Â
 
-			// Typeì— ë”°ë¼ ë‹¤ë¥¸ êµ¬ì¡°ì²´ë¥¼ ê°€ì§„ switch (ì§ì ‘ í˜•ë³€í™˜ í•´ì¤˜ì•¼ í•¨)
+			// Type¿¡ µû¶ó ´Ù¸¥ ±¸Á¶Ã¼¸¦ °¡Áø switch (Á÷Á¢ Çüº¯È¯ ÇØÁà¾ß ÇÔ)
 			switch (comm_msg->type) {
-				case (TYPE_ID) :	// TYPE_ID ì¸ ê²½ìš° (id ì¶œë ¥)
-					// ***  í˜•ë³€í™˜ *** //
-					ID_MSG* id_msg;
-					id_msg = (ID_MSG*)&(ptr->buf); // IDë¡œ í˜•ë³€í™˜
-					printf("[TYPE_ID ë°›ì€ ë°ì´í„°] %s\n", id_msg->msg);
-					// *** í˜•ë³€í™˜ ë *** //
+			case (TYPE_ID):	// TYPE_ID ÀÎ °æ¿ì (id Ãâ·Â)
+				// ***  Çüº¯È¯ *** //
+				ID_MSG* id_msg;
+				id_msg = (ID_MSG*)&(ptr->buf); // ID·Î Çüº¯È¯
+				printf("[TYPE_ID ¹ŞÀº µ¥ÀÌÅÍ] %s\n", id_msg->msg);
+				// *** Çüº¯È¯ ³¡ *** //
 
-					// ë§Œì•½ í˜„ì¬ ë°›ì€ ë‹‰ë„¤ì„ì´ ì¤‘ë³µë˜ì§€ ì•Šì•˜ë‹¤ë©´ (ture)
-					if (CheckIDDuplication(nTotalSockets, SocketInfoArray, id_msg->msg)) {
-						printf("[TCP] ì¤‘ë³µëœ ì•„ì´ë”” ì—†ìŒ");
-						setIDInSocket(id_msg->msg, ptr); //id ë“±ë¡
-						// ---- í´ë¼ì´ì–¸íŠ¸ë¡œ ì „ì†¡ ------//
-						size_t dataSize = strlen("true"); // ì¤‘ë³µì´ ì•„ë‹ˆë¯€ë¡œ, "true" í´ë¼ì´ì–¸íŠ¸ë¡œ ì „ì†¡
-						retval = send(ptr->sock, "true", dataSize, 0);
+				// ¸¸¾à ÇöÀç ¹ŞÀº ´Ğ³×ÀÓÀÌ Áßº¹µÇÁö ¾Ê¾Ò´Ù¸é (ture)
+				if (CheckIDDuplication(nTotalSockets, SocketInfoArray, id_msg->msg)) {
+					printf("[TCP] Áßº¹µÈ ¾ÆÀÌµğ ¾øÀ½");
+					setIDInSocket(id_msg->msg, ptr); //id µî·Ï
+					// ---- Å¬¶óÀÌ¾ğÆ®·Î Àü¼Û ------//
+					size_t dataSize = strlen("true"); // Áßº¹ÀÌ ¾Æ´Ï¹Ç·Î, "true" Å¬¶óÀÌ¾ğÆ®·Î Àü¼Û
+					retval = send(ptr->sock, "true", dataSize, 0);
 
-						if (retval == SOCKET_ERROR) {
-							err_display("send()");
-							//break;
-						}
-						// ----------------------------//
+					if (retval == SOCKET_ERROR) {
+						err_display("send()");
+						//break;
 					}
-					else {	// id ì¤‘ë³µì´ ìˆë‹¤ë©´, ë“±ë¡ ì‹¤íŒ¨
-						printf("[TCP] IDê°€ ì¤‘ë³µë©ë‹ˆë‹¤. ë“±ë¡ ì‹¤íŒ¨ì…ë‹ˆë‹¤.");
-						// ---- í´ë¼ì´ì–¸íŠ¸ë¡œ ì „ì†¡ ------//
-						size_t dataSize = strlen("false"); //ì¤‘ë³µì´ë¯€ë¡œ, "false" í´ë¼ì´ì–¸íŠ¸ì— ì „ì†¡
-						retval = send(ptr->sock, "false", dataSize, 0);
+					// ----------------------------//
+				}
+				else {	// id Áßº¹ÀÌ ÀÖ´Ù¸é, µî·Ï ½ÇÆĞ
+					printf("[TCP] ID°¡ Áßº¹µË´Ï´Ù. µî·Ï ½ÇÆĞÀÔ´Ï´Ù.");
+					// ---- Å¬¶óÀÌ¾ğÆ®·Î Àü¼Û ------//
+					size_t dataSize = strlen("false"); //Áßº¹ÀÌ¹Ç·Î, "false" Å¬¶óÀÌ¾ğÆ®¿¡ Àü¼Û
+					retval = send(ptr->sock, "false", dataSize, 0);
 
-						if (retval == SOCKET_ERROR) {
-							err_display("send()");
-							//break;
-						}
-						// ----------------------------//
-
-						// ---------ì†Œì¼“ ì§€ìš°ê¸° -------//
-						
-						// RemoveSocketInfo(ptr->sock);
-						// ----------------------------//
+					if (retval == SOCKET_ERROR) {
+						err_display("send()");
+						//break;
 					}
+					// ----------------------------//
 
-					break;
-				case (TYPE_ID_RESULT):	// TYPE_ID ì¸ ê²½ìš° (id ì¶œë ¥)
-					// ***  í˜•ë³€í™˜ *** //
-					ID_RESULT_MSG* id_result_msg;
-					id_result_msg = (ID_RESULT_MSG*)&(ptr->buf); // IDë¡œ í˜•ë³€í™˜
-					printf("[TYPE_RESULT_ID ë°›ì€ ë°ì´í„°] %s\n", id_result_msg->msg);
-					// *** í˜•ë³€í™˜ ë *** //
+					// ---------¼ÒÄÏ Áö¿ì±â -------//
 
-					// --------- ì†Œì¼“ ë‹‰ë„¤ì„(ID) ì €ì¥í•˜ê³ , guiì— ì˜¬ë¦¬ê¸° --------- //
-					printf("[TCP] TYPE_RESULT_ID, í˜„ì¬ ì†Œì¼“ ë‹‰ë„¤ì„ ë“±ë¡ì™„ë£Œ : %s\n", ptr->id_nickname_char);
-					printf("[TCP] TYPE_RESULT_ID, í˜„ì¬ ì†Œì¼“ port ë“±ë¡ì™„ë£Œ : %d\n", ptr->sin_port);
-					printf("[TCP] TYPE_RESULT_ID, í˜„ì¬ ì†Œì¼“ ì£¼ì†Œ(char) : %s\n", inet_ntoa(ptr->sin_addr));
-					//MessageBox(NULL, ptr->id_nickname, _T("í˜„ì¬ ì†Œì¼“ ë‹‰ë„¤ì„ ë“±ë¡ì™„ë£Œ(_TCHAR)"), MB_ICONERROR);
-					// =========== ì§€ìœ¤ ============
-					AddClientToListView(ptr->sin_port, ptr->id_nickname);
-					// =============================
+					// RemoveSocketInfo(ptr->sock);
+					// ----------------------------//
+				}
 
-					// -------------------------------------------------------- //
-					break;
-				// ======== ì—°ê²½ =======
+				break;
+			case (TYPE_ID_RESULT):	// TYPE_ID ÀÎ °æ¿ì (id Ãâ·Â)
+				// ***  Çüº¯È¯ *** //
+				ID_RESULT_MSG* id_result_msg;
+				id_result_msg = (ID_RESULT_MSG*)&(ptr->buf); // ID·Î Çüº¯È¯
+				printf("[TYPE_RESULT_ID ¹ŞÀº µ¥ÀÌÅÍ] %s\n", id_result_msg->msg);
+				// *** Çüº¯È¯ ³¡ *** //
+
+				// --------- ¼ÒÄÏ ´Ğ³×ÀÓ(ID) ÀúÀåÇÏ°í, gui¿¡ ¿Ã¸®±â --------- //
+				printf("[TCP] TYPE_RESULT_ID, ÇöÀç ¼ÒÄÏ ´Ğ³×ÀÓ µî·Ï¿Ï·á : %s\n", ptr->id_nickname_char);
+				printf("[TCP] TYPE_RESULT_ID, ÇöÀç ¼ÒÄÏ port µî·Ï¿Ï·á : %d\n", ptr->sin_port);
+				printf("[TCP] TYPE_RESULT_ID, ÇöÀç ¼ÒÄÏ ÁÖ¼Ò(char) : %s\n", inet_ntoa(ptr->sin_addr));
+				//MessageBox(NULL, ptr->id_nickname, _T("ÇöÀç ¼ÒÄÏ ´Ğ³×ÀÓ µî·Ï¿Ï·á(_TCHAR)"), MB_ICONERROR);
+				// =========== ÁöÀ± ============
+				AddClientToListView(ptr->sin_port, ptr->id_nickname);
+				// =============================
+
+				// -------------------------------------------------------- //
+				break;
+				// ======== ¿¬°æ =======
 				//case TYPE_CHAT:
 				//	fd = fopen("chatting_log.txt", "a");
 				//	CHAT_MSG* chat_msg;
@@ -312,15 +315,15 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				//	fwrite(chat_msg->msg, sizeof(char*), sizeof(chat_msg->msg), fd);
 				//	fclose(fd);
 				// ==================
-				default:
-					break;
+			default:
+				break;
 			}
 
-			//printf("[TCP í´ë¼ì´ì–¸íŠ¸] %dë°”ì´íŠ¸ë¥¼ ë°›ì•˜ìŠµë‹ˆë‹¤.\n", retval);
-			//printf("[ë°›ì€ ë°ì´í„°] %s\n", ptr->buf);
+			//printf("[TCP Å¬¶óÀÌ¾ğÆ®] %d¹ÙÀÌÆ®¸¦ ¹Ş¾Ò½À´Ï´Ù.\n", retval);
+			//printf("[¹ŞÀº µ¥ÀÌÅÍ] %s\n", ptr->buf);
 			// ================================================================== //
 			// 
-			// ======== ì—°ê²½ =======
+			// ======== ¿¬°æ =======
 			addMessage(ptr->buf);
 			// ====================
 
@@ -329,30 +332,43 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				RemoveSocketInfo(wParam);
 				return;
 			}
-			printf("[TCP] ë°ì´í„° ê¸¸ì´ : %d, ë°ì´í„° : %s\n", retval, buf);
-			// ë°›ì€ ë°”ì´íŠ¸ ìˆ˜ ëˆ„ì 
+			printf("[TCP] µ¥ÀÌÅÍ ±æÀÌ : %d, µ¥ÀÌÅÍ : %s\n", retval, buf);
+			// ¹ŞÀº ¹ÙÀÌÆ® ¼ö ´©Àû
 			ptr->recvbytes += retval;
 
-			// ì±„íŒ… ë°ì´í„°ë§Œ í‘œê¸°í•œë‹¤.
+			// Ã¤ÆÃ µ¥ÀÌÅÍ¸¸ Ç¥±âÇÑ´Ù.
 		}
 		// UDP socket
 		else
 		{
-			// ë°ì´í„° ë°›ê¸°
+			// µ¥ÀÌÅÍ ¹Ş±â
 			addrlen = sizeof(clientaddr);
 			retval = recvfrom(socket_UDP, buf, BUFSIZE, 0, (SOCKADDR*)&clientaddr, &addrlen);
-			printf("[UDP] ë°ì´í„° ê¸¸ì´ : %d, ë°ì´í„° : %s\n", retval, ((COMM_MSG*)&buf)->dummy);
+
+			printf("UDP groupNum : %d, type : %d\n", ((COMM_MSG*)&buf)->groupNum, ((COMM_MSG*)&buf)->type);
+
+
+			groupNumUDP = GetGroupNumber(clientaddr);
+			printf("Get Group Num : %d\n", groupNumUDP);
+
+			if (groupNumUDP == -1)
+			{
+				// UDP·Î Á¢¼ÓÇÑ Å¬¶ó Á¤º¸ ¼öÁı
+				AddSocketInfoUDP(clientaddr, ((COMM_MSG*)&buf)->groupNum);
+			}
+
+			printf("[UDP] µ¥ÀÌÅÍ ±æÀÌ : %d, µ¥ÀÌÅÍ : %s\n", retval, ((COMM_MSG*)&buf)->dummy);
 			char msg[256];
-			strcpy(msg,((COMM_MSG*)&buf)->dummy);
+			strcpy(msg, ((COMM_MSG*)&buf)->dummy);
 			if (retval == SOCKET_ERROR) {
 				err_display("recvfrom()");
 				return;
 			}
-			// ======== ì—°ê²½ =======
+			// ======== ¿¬°æ =======
 			COMM_MSG* comm_msg = (COMM_MSG*)&buf;
 			switch (comm_msg->type) {
 			case TYPE_CHAT:
-				printf("ì±„íŒ…ì…ë‹ˆë‹¤\n");
+				printf("Ã¤ÆÃÀÔ´Ï´Ù\n");
 				FILE* fd = fopen("chatting_log.txt", "w");
 				fwrite(msg, sizeof(char), strlen(msg), fd);
 				fclose(fd);
@@ -360,29 +376,26 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			}
 
 			// ====================
-
-			// UDPë¡œ ì ‘ì†í•œ í´ë¼ ì •ë³´ ìˆ˜ì§‘
-			AddSocketInfoUDP(clientaddr);
 		}
 	case FD_WRITE:
-		// UDP ì†Œì¼“ì´ ì•„ë‹Œ ê²½ìš° (TCPì¸ ê²½ìš°)
+		// UDP ¼ÒÄÏÀÌ ¾Æ´Ñ °æ¿ì (TCPÀÎ °æ¿ì)
 		if (wParam != socket_UDP)
 		{
 			ptr = GetSocketInfo(wParam);
 			//for (int i = 0; i < nTotalSockets; i++) {
 			//	SOCKETINFO* ptr = SocketInfoArray[i];
 			if (ptr->recvbytes == BUFSIZE) {
-				// ë°›ì€ ë°”ì´íŠ¸ ìˆ˜ ë¦¬ì…‹
+				// ¹ŞÀº ¹ÙÀÌÆ® ¼ö ¸®¼Â
 				ptr->recvbytes = 0;
 
-				// í˜„ì¬ ì ‘ì†í•œ ëª¨ë“  í´ë¼ì´ì–¸íŠ¸ì—ê²Œ ë°ì´í„°ë¥¼ ë³´ëƒ„!
+				// ÇöÀç Á¢¼ÓÇÑ ¸ğµç Å¬¶óÀÌ¾ğÆ®¿¡°Ô µ¥ÀÌÅÍ¸¦ º¸³¿!
 				for (int j = 0; j < nTotalSockets; j++) {
 					SOCKETINFO* ptr2 = SocketInfoArray[j];
 					retval = send(ptr2->sock, ptr->buf, BUFSIZE, 0);
 					if (retval == SOCKET_ERROR) {
 						err_display("send()");
 						RemoveSocketInfo(j);
-						--j; // ë£¨í”„ ì¸ë±ìŠ¤ ë³´ì •
+						--j; // ·çÇÁ ÀÎµ¦½º º¸Á¤
 						continue;
 					}
 				}
@@ -394,31 +407,37 @@ void ProcessSocketMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			for (int i = 0; i < nTotalUDPSockets; i++)
 			{
-				SOCKADDR_IN clientUDP = UDPSocketInfoArray[i];
-				// ë°ì´í„° ë³´ë‚´ê¸°
-				retval = sendto(socket_UDP, buf, BUFSIZE, 0, (SOCKADDR*)&clientUDP, sizeof(clientUDP));
-				if (retval == SOCKET_ERROR) {
-					err_display("sendto()");
-					return;
+				// °°Àº ±×·ì¿¡¸¸ µ¥ÀÌÅÍ Àü¼Û
+				UDPINFO* clientUDP = UDPSocketInfoArray[i];
+				printf("send groupNumUDP : %d, clientUDP->GroupNum : %d\n", groupNumUDP, clientUDP->groupNum);
+				if (groupNumUDP == clientUDP->groupNum)
+				{
+					// µ¥ÀÌÅÍ º¸³»±â
+					retval = sendto(socket_UDP, buf, BUFSIZE, 0, (SOCKADDR*)&clientUDP->addr, sizeof(clientUDP->addr));
+					if (retval == SOCKET_ERROR) {
+						err_display("sendto()");
+						return;
+					}
+					printf("sendto retval : %d\n", retval);
 				}
 			}
 		}
 		break;
 	case FD_CLOSE:
 		RemoveSocketInfo(wParam);
-	
+
 		break;
 	}
 }
 
-// ì†Œì¼“ ì •ë³´ ì–»ê¸°
+// ¼ÒÄÏ Á¤º¸ ¾ò±â
 SOCKETINFO* GetSocketInfo(SOCKET sock)
 {
-	// í˜„ì¬ ì ‘ì†í•œ í´ë¼ì´ì–¸íŠ¸ ì¤‘ì—ì„œ ì¼ì¹˜í•˜ëŠ” ì†Œì¼“ íƒìƒ‰
+	// ÇöÀç Á¢¼ÓÇÑ Å¬¶óÀÌ¾ğÆ® Áß¿¡¼­ ÀÏÄ¡ÇÏ´Â ¼ÒÄÏ Å½»ö
 	for (int i = 0; i < nTotalSockets; i++)
 	{
 		SOCKETINFO* ptr = SocketInfoArray[i];
-		// ì°¾ì•˜ì„ ê²½ìš°, í•´ë‹¹ ì†Œì¼“ ë°˜í™˜
+		// Ã£¾ÒÀ» °æ¿ì, ÇØ´ç ¼ÒÄÏ ¹İÈ¯
 		if (ptr->sock == sock)
 		{
 			return ptr;
@@ -427,76 +446,91 @@ SOCKETINFO* GetSocketInfo(SOCKET sock)
 	return NULL;
 }
 
-// UDP í´ë¼ ì •ë³´ ì¶”ê°€
-bool AddSocketInfoUDP(SOCKADDR_IN addr)
+// UDP Å¬¶ó Á¤º¸ Ãß°¡
+bool AddSocketInfoUDP(SOCKADDR_IN addr, int groupNum)
 {
-	// ì´ì „ì— ì ‘ì†í•œ ì ì´ ìˆëŠ” ìƒíƒœì¸ì§€ í™•ì¸
+	// ÀÌÀü¿¡ Á¢¼ÓÇÑ ÀûÀÌ ÀÖ´Â »óÅÂÀÎÁö È®ÀÎ
 	for (int i = 0; i < nTotalUDPSockets; i++)
 	{
-		if (inet_ntoa(UDPSocketInfoArray[i].sin_addr) == inet_ntoa(addr.sin_addr) &&
-			ntohs(UDPSocketInfoArray[i].sin_port) == ntohs(addr.sin_port) &&
-			ntohs(UDPSocketInfoArray[i].sin_family) == ntohs(addr.sin_family))
+		if (inet_ntoa(UDPSocketInfoArray[i]->addr.sin_addr) == inet_ntoa(addr.sin_addr) &&
+			ntohs(UDPSocketInfoArray[i]->addr.sin_port) == ntohs(addr.sin_port) &&
+			ntohs(UDPSocketInfoArray[i]->addr.sin_family) == ntohs(addr.sin_family))
 		{
+			// ±×·ìÀ» º¯°æÇÑ °æ¿ì
+			if ((groupNum != UDPSocketInfoArray[i]->groupNum) && (groupNum == TYPE_GROUP_A || groupNum == TYPE_GROUP_B))
+			{
+				UDPSocketInfoArray[i]->groupNum = groupNum;
+			}
 			return false;
 		}
 	}
 
-	// UDP í´ë¼ ì •ë³´ ì¶”ê°€
-	UDPSocketInfoArray[nTotalUDPSockets++] = addr;
+	UDPINFO* newUDPClient = (UDPINFO*)malloc(sizeof(UDPINFO));
+	if (newUDPClient == NULL)
+	{
+		return false;
+	}
+	newUDPClient->addr = addr;
+	newUDPClient->groupNum = groupNum;
+
+	// UDP Å¬¶ó Á¤º¸ Ãß°¡
+	UDPSocketInfoArray[nTotalUDPSockets++] = newUDPClient;
+
+	printf("Add UDP Client Info groupNum : %d\n", newUDPClient->groupNum);
 	return true;
 }
 
-// TCP ì†Œì¼“ ì •ë³´ ì¶”ê°€
+// TCP ¼ÒÄÏ Á¤º¸ Ãß°¡
 bool AddSocketInfoTCP(SOCKET sock)
 {
 	if (nTotalSockets >= FD_SETSIZE) {
-		printf("[ì˜¤ë¥˜] ì†Œì¼“ ì •ë³´ë¥¼ ì¶”ê°€í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤!\n");
+		printf("[¿À·ù] ¼ÒÄÏ Á¤º¸¸¦ Ãß°¡ÇÒ ¼ö ¾ø½À´Ï´Ù!\n");
 		return false;
 	}
-	SOCKETINFO *ptr = new SOCKETINFO;
+	SOCKETINFO* ptr = new SOCKETINFO;
 	if (ptr == NULL) {
-		printf("[ì˜¤ë¥˜] ë©”ëª¨ë¦¬ê°€ ë¶€ì¡±í•©ë‹ˆë‹¤!\n");
+		printf("[¿À·ù] ¸Ş¸ğ¸®°¡ ºÎÁ·ÇÕ´Ï´Ù!\n");
 		return false;
 	}
 	ptr->sock = sock;
 	ptr->recvbytes = 0;
 
-	//========== ì§€ì•ˆ =============//
-	// í´ë¼ì´ì–¸íŠ¸ ì •ë³´ ì–»ê¸°
+	//========== Áö¾È =============//
+	// Å¬¶óÀÌ¾ğÆ® Á¤º¸ ¾ò±â
 	struct sockaddr_in clientaddr;
 	int addrlen = sizeof(clientaddr);
 	getpeername(sock, (struct sockaddr*)&clientaddr, &addrlen);
 
-	ptr->sin_addr = clientaddr.sin_addr;	// í´ë¼ì´ì–¸íŠ¸ ì£¼ì†Œ ì €ì¥
-	ptr->sin_port = ntohs(clientaddr.sin_port);	// í´ë¼ì´ì–¸íŠ¸ í¬íŠ¸ë²ˆí˜¸ ì €ì¥
+	ptr->sin_addr = clientaddr.sin_addr;	// Å¬¶óÀÌ¾ğÆ® ÁÖ¼Ò ÀúÀå
+	ptr->sin_port = ntohs(clientaddr.sin_port);	// Å¬¶óÀÌ¾ğÆ® Æ÷Æ®¹øÈ£ ÀúÀå
 
-	// TCP ì†Œì¼“ ë°°ì—´ì— ì¶”ê°€
+	// TCP ¼ÒÄÏ ¹è¿­¿¡ Ãß°¡
 	SocketInfoArray[nTotalSockets++] = ptr;
 
 	return true;
 }
 
-// ì†Œì¼“ ì •ë³´ ì‚­ì œ
+// ¼ÒÄÏ Á¤º¸ »èÁ¦
 void RemoveSocketInfo(SOCKET sock)
 {
-	// í´ë¼ì´ì–¸íŠ¸ ì •ë³´ ì–»ê¸°
+	// Å¬¶óÀÌ¾ğÆ® Á¤º¸ ¾ò±â
 	struct sockaddr_in clientaddr;
 	int addrlen = sizeof(clientaddr);
 	getpeername(sock, (struct sockaddr*)&clientaddr, &addrlen);
-	// í´ë¼ì´ì–¸íŠ¸ ì •ë³´ ì¶œë ¥
+	// Å¬¶óÀÌ¾ğÆ® Á¤º¸ Ãâ·Â
 	char addr[INET_ADDRSTRLEN];
 	inet_ntop(AF_INET, &clientaddr.sin_addr, addr, sizeof(addr));
-	printf("[TCP/IPv4 ì„œë²„] í´ë¼ì´ì–¸íŠ¸ ì¢…ë£Œ: IP ì£¼ì†Œ=%s, í¬íŠ¸ ë²ˆí˜¸=%d\n",
+	printf("[TCP/IPv4 ¼­¹ö] Å¬¶óÀÌ¾ğÆ® Á¾·á: IP ÁÖ¼Ò=%s, Æ÷Æ® ¹øÈ£=%d\n",
 		addr, ntohs(clientaddr.sin_port));
-	// =========== ì§€ìœ¤ ============
+	// =========== ÁöÀ± ============
 	RemoveClientFromListView(ntohs(clientaddr.sin_port));
 	// =============================
 
-	// í´ë¼ì´ì–¸íŠ¸ ì†Œì¼“ ì œê±°
+	// Å¬¶óÀÌ¾ğÆ® ¼ÒÄÏ Á¦°Å
 	for (int i = 0; i < nTotalSockets; i++)
 	{
 		SOCKETINFO* ptr = SocketInfoArray[i];
-		// ì°¾ì•˜ì„ ê²½ìš°, í•´ë‹¹ ì†Œì¼“ ë°˜í™˜
+		// Ã£¾ÒÀ» °æ¿ì, ÇØ´ç ¼ÒÄÏ ¹İÈ¯
 		if (ptr->sock == sock)
 		{
 			if (i != (nTotalSockets - 1))
@@ -507,20 +541,36 @@ void RemoveSocketInfo(SOCKET sock)
 		}
 	}
 
-	// ì†Œì¼“ ë‹«ê¸°
+	// ¼ÒÄÏ ´İ±â
 	closesocket(sock);
+}
+
+// ÇØ´ç Å¬¶óÀÌ¾ğÆ®ÀÇ ±×·ì Á¤º¸ °¡Á®¿À±â
+int GetGroupNumber(SOCKADDR_IN addr)
+{
+	// ÀÌÀü¿¡ Á¢¼ÓÇÑ ÀûÀÌ ÀÖ´Â »óÅÂÀÎÁö È®ÀÎ
+	for (int i = 0; i < nTotalUDPSockets; i++)
+	{
+		if (inet_ntoa(UDPSocketInfoArray[i]->addr.sin_addr) == inet_ntoa(addr.sin_addr) &&
+			ntohs(UDPSocketInfoArray[i]->addr.sin_port) == ntohs(addr.sin_port) &&
+			ntohs(UDPSocketInfoArray[i]->addr.sin_family) == ntohs(addr.sin_family))
+		{
+			return UDPSocketInfoArray[i]->groupNum;
+		}
+	}
+	return -1;
 }
 
 
 void addMessage(char* message) {
-	if ((g_msgQueue.tail + 1) % BUFSIZE == g_msgQueue.head) { //íê°€ ê½‰ì°¬ ê²½ìš°: 
-		g_msgQueue.head = (g_msgQueue.head + 1) % BUFSIZE; //ë§ˆì§€ë§‰ ìš”ì†Œë¥¼ í•˜ë‚˜ ì§€ìš°ê³  ê³µê°„ í•˜ë‚˜ë¥¼ í™•ë³´í•œë‹¤.
+	if ((g_msgQueue.tail + 1) % BUFSIZE == g_msgQueue.head) { //Å¥°¡ ²ËÂù °æ¿ì: 
+		g_msgQueue.head = (g_msgQueue.head + 1) % BUFSIZE; //¸¶Áö¸· ¿ä¼Ò¸¦ ÇÏ³ª Áö¿ì°í °ø°£ ÇÏ³ª¸¦ È®º¸ÇÑ´Ù.
 	}
 	strcpy(g_msgQueue.queue[g_msgQueue.tail], message);
 	g_msgQueue.tail = (g_msgQueue.tail + 1) % BUFSIZE;
 }
 
-// ì„œë²„ì—ì„œ í´ë¼ì´ì–¸íŠ¸ì— 
+// ¼­¹ö¿¡¼­ Å¬¶óÀÌ¾ğÆ®¿¡ 
 DWORD WINAPI messageQueueThread(LPVOID arg) {
 	return 0;
 }

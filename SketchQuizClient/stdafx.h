@@ -208,4 +208,5 @@ static DRAWELLIPSE_MSG g_drawellipsemsg; // 타원 그리기 메시지
 static DRAWPOLYGON_MSG  g_drawpolygonmsg;   // 다각형 그리기 메시지
 
 static SOCKADDR_IN serveraddr; // 서버 주소
-//
+
+static int g_UDPGroupNum = 0; // UDP 그룹 정보
